@@ -93,18 +93,6 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    // TODO(mitej): CortexON is TheAgentic's open-source multi-agent system
-    // (450+ stars, 75+ forks). It postdates the résumé, so I can't confirm your
-    // role — rewrite this in your own words, or delete the entry.
-    name: "CortexON",
-    year: "2025",
-    blurb:
-      "Open-source multi-agent system that takes an open-ended task, plans it, then browses and executes across tools until it returns a finished result. 450+ stars, 75+ forks.",
-    stack: ["Python", "TypeScript", "React"],
-    href: "https://github.com/TheAgenticAI/CortexON",
-    isLive: true,
-  },
-  {
     name: "Boardly",
     year: "2024",
     blurb:

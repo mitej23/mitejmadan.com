@@ -28,13 +28,12 @@ In priority order:
 |---|------|----------------|
 | 1 | **TheAgentic role** — start date + all three bullets | The résumé doesn't cover it, so the date renders literally as `TODO — Present`. Easily the most visible placeholder left. |
 | 2 | **`offClock`** | Invented. The résumé had nothing personal in it. A generic hobbies line is worse than deleting the section. |
-| 3 | **CortexON entry** | Postdates the résumé, so your role is unconfirmed. Rewrite or delete. |
-| 4 | **Food Ordering System link** | The résumé's URL (`mitej23/restaurant-app`) 404s — renamed, deleted, or private. The entry currently renders with no link at all. |
-| 5 | **`profile.resume`** | Deliberately `null`, which hides the nav link. You called the PDF outdated, and publishing it under "Résumé" would misrepresent you. Drop a current one at `public/resume.pdf` and set the path to restore the link. |
-| 6 | **Three project blurbs** | `db-alembic-schema-viewer`, `llm-math-visualiser`, and `canvas-editor` have no repo descriptions, so those blurbs are my reading of the code. |
-| 7 | **`stack`** | Evidence-based only. I removed my earlier guesses (FastAPI, Redis, Docker, AWS) rather than assert them — add what you actually use at TheAgentic. |
-| 8 | **`links.email`** | Set to the work address. Switch if you'd rather personal mail (the résumé lists `mitejmadan@gmail.com`). |
-| 9 | **`photo.caption`** | Just says "Thailand". The cliffs look like Krabi, but I'm not guessing the beach or year on your behalf. |
+| 3 | **Food Ordering System link** | The résumé's URL (`mitej23/restaurant-app`) 404s — renamed, deleted, or private. The entry currently renders with no link at all. |
+| 4 | **`profile.resume`** | Deliberately `null`, which hides the nav link. You called the PDF outdated, and publishing it under "Résumé" would misrepresent you. Drop a current one at `public/resume.pdf` and set the path to restore the link. |
+| 5 | **Three project blurbs** | `db-alembic-schema-viewer`, `llm-math-visualiser`, and `canvas-editor` have no repo descriptions, so those blurbs are my reading of the code. |
+| 6 | **`stack`** | Evidence-based only. I removed my earlier guesses (FastAPI, Redis, Docker, AWS) rather than assert them — add what you actually use at TheAgentic. |
+| 7 | **`links.email`** | Set to the work address. Switch if you'd rather personal mail (the résumé lists `mitejmadan@gmail.com`). |
+| 8 | **`photo.caption`** | Just says "Thailand". The cliffs look like Krabi, but I'm not guessing the beach or year on your behalf. |
 
 Verified from the résumé and needing no attention: the Idigitize Infotech role,
 education, and the Boardly / Campaigns / College Data Collection blurbs.
