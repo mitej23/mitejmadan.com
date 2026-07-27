@@ -26,7 +26,7 @@ In priority order:
 
 | # | What | Why it matters |
 |---|------|----------------|
-| 1 | **TheAgentic role** — start date + all three bullets | The résumé doesn't cover it, so the date renders literally as `TODO — Present`. Easily the most visible placeholder left. |
+| 1 | **TheAgentic start date** | Renders literally as `TODO — Present`. The one remaining placeholder that a reader will see. The role's bullets are now written from the actual codebases. |
 | 2 | **`offClock`** | Invented. The résumé had nothing personal in it. A generic hobbies line is worse than deleting the section. |
 | 3 | **Food Ordering System link** | The résumé's URL (`mitej23/restaurant-app`) 404s — renamed, deleted, or private. The entry currently renders with no link at all. |
 | 4 | **`profile.resume`** | Deliberately `null`, which hides the nav link. You called the PDF outdated, and publishing it under "Résumé" would misrepresent you. Drop a current one at `public/resume.pdf` and set the path to restore the link. |
@@ -44,6 +44,36 @@ next to the rest. Add them back if you disagree.
 
 Then update the domain: `SITE` in `scripts/prerender.mjs`, and the `canonical` /
 `og:*` / JSON-LD URLs in `index.html`.
+
+## The anonymised systems
+
+`systems` in `src/content.ts` describes seven systems built at TheAgentic and
+renders them on `/experience`. **No product, company, or client name appears in
+any of them**, and nothing identifies a specific customer. What's kept is the
+sector, the architecture, and the engineering — standard practice for work under
+NDA, and the part a reader is actually evaluating.
+
+Every claim was read out of the source by a reviewer rather than lifted from a
+README, and `role` is set on any entry where the work was one part of a larger
+team effort — including one entry that was an architecture assessment with no
+production code of his in it at all. Two things were deliberately *not* claimed:
+test coverage or production-hardening for the court-sync subsystem (it has no
+committed tests, by that team's explicit policy), and any production metric —
+user counts, request volumes, uptime — because none is verifiable from the code.
+
+Terminology follows what frontier-lab engineering writing actually uses:
+*orchestrator-worker*, *lead agent*, *subagent*, *agent harness*,
+*human-in-the-loop*. Notably **not** "supervisor agent", which reads as standard
+but appears in none of the current primary sources.
+
+There's a leak check worth re-running after any edit to that section:
+
+```bash
+grep -rEioh -f .leakcheck dist/ src/
+```
+
+It should return nothing. (`src/lib/reveal.ts` matches "nishe" inside the word
+"finishes" — that's the one known false positive.)
 
 ## How it's built
 

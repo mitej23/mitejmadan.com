@@ -1,8 +1,9 @@
-import { education, experience, profile } from "../content";
+import { education, experience, profile, systems } from "../content";
 import { PageHead } from "../components/PageHead";
 import { Reveal } from "../components/Reveal";
 import { RoleRow } from "../components/RoleRow";
 import { Section } from "../components/Section";
+import { SystemRow } from "../components/SystemRow";
 
 export function Experience() {
   return (
@@ -15,9 +16,25 @@ export function Experience() {
         ))}
       </ul>
 
+      <Section label="Selected systems" gap="mt-10 sm:mt-12">
+        <Reveal className="mb-7 -mt-1">
+          <p className="text-[13.5px] leading-[1.6] text-ink-3">
+            Client and product names are left out on purpose. What's kept is the sector,
+            the architecture, and the engineering — and a scope note wherever the work
+            was one part of a larger team effort.
+          </p>
+        </Reveal>
+
+        <ul className="flex flex-col">
+          {systems.map((s, i) => (
+            <SystemRow key={s.title} system={s} i={i} />
+          ))}
+        </ul>
+      </Section>
+
       {/* Tighter than the default: the role list above already ends on its own
           generous bottom padding, so the standard gap reads as a dead zone. */}
-      <Section label="Education" gap="mt-10 sm:mt-12">
+      <Section label="Education" gap="mt-14 sm:mt-16">
         <ul className="flex flex-col">
           {education.map((d, i) => (
             <Reveal
