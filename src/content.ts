@@ -24,7 +24,7 @@ export const profile = {
    * purpose: the fallback is a drawn monogram that costs zero network requests.
    * Set it once you have a crop you like (400×400 webp is plenty).
    */
-  avatar: null as string | null,
+  avatar: "/avatar-256.webp" as string | null,
   // Two or three short paragraphs. First person, specific, no adjectives that
   // could apply to anyone.
   intro: [
@@ -269,4 +269,27 @@ export const stack: { group: string; items: string[] }[] = [
 // still the section with no basis behind it. Rewrite it or delete it — a
 // placeholder reads more obviously here than anywhere else on the site.
 export const offClock =
-  "Away from the editor I read a lot of systems writing, take things apart to see how they were put together, and lose evenings to problems nobody asked me to solve.";
+  "Away from the editor I read a lot of systems writing, take things apart to see how they were put together, and lose evenings to problems nobody asked me to solve. Every so often I get far enough from a screen to remember why.";
+
+/**
+ * The one photograph on the site. Cropped square from the original 3024×4032 —
+ * the top half of the frame was empty sky, and dropping it puts the limestone
+ * cliffs, the water gradient, and the sand all in one composition.
+ *
+ * `lqip` is a 20×20 WebP inlined as a data URI (203 bytes). It paints the photo's
+ * colour immediately, including in the prerendered HTML, so the space is never
+ * blank while the real file loads.
+ */
+export const photo = {
+  src: "/photos/thailand-600.webp",
+  srcSet:
+    "/photos/thailand-400.webp 400w, /photos/thailand-600.webp 600w, /photos/thailand-900.webp 900w",
+  width: 600,
+  height: 600,
+  alt: "Mitej standing at the shoreline on a beach in Thailand, limestone cliffs across the water behind him.",
+  // TODO(mitej): name the actual beach and year if you want it more specific —
+  // the cliffs look like Krabi, but I'm not going to guess on your behalf.
+  caption: "Thailand",
+  lqip:
+    "data:image/webp;base64,UklGRn4AAABXRUJQVlA4IHIAAAAQBQCdASoUABQAPt1cqU2opSQiKA1REBuJQBYj6rg1MSrKEDmDKJDfwTsz+0qcBagAAPeYxaZ37yC+lhN8G/WYjy2Kcnp1XsM/B2BtfII1/Qwu4QEIo/drgkBqy5szlzsL1rom48ovhtXFnx60Q4QAAAA=",
+};

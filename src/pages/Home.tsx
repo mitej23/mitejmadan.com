@@ -1,6 +1,7 @@
 import { capabilities, offClock, profile, projects, stack } from "../content";
 import { Avatar } from "../components/Avatar";
 import { LocalTime } from "../components/LocalTime";
+import { Photo } from "../components/Photo";
 import { ProjectRow } from "../components/ProjectRow";
 import { Reveal } from "../components/Reveal";
 import { Section } from "../components/Section";
@@ -122,11 +123,18 @@ export function Home() {
         </dl>
       </Section>
 
-      {/* ── Off the clock ── */}
+      {/* ── Off the clock. The one place the single-column grid breaks, and the
+             one photograph on the site — a deliberate pause before the contact
+             list, not decoration. ── */}
       <Section label="Off the clock">
-        <Reveal>
-          <p className="text-[14.5px] leading-[1.68] text-ink-2">{offClock}</p>
-        </Reveal>
+        <div className="flex flex-col gap-5 sm:grid sm:grid-cols-[17rem_minmax(0,1fr)] sm:items-start sm:gap-7">
+          <Reveal>
+            <Photo />
+          </Reveal>
+          <Reveal i={1}>
+            <p className="text-[14.5px] leading-[1.68] text-ink-2">{offClock}</p>
+          </Reveal>
+        </div>
       </Section>
 
       {/* ── Contact ── */}
