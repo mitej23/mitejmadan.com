@@ -1,0 +1,309 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Fonts — self-hosted variable Instrument Sans. Monospace is the system stack
+   on purpose: it costs zero bytes and it is only used for tabular year columns.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@font-face {
+  font-family: "Instrument Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/instrument-sans-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Instrument Sans";
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/instrument-sans-latin-italic.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Tokens
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  /* The measure. Every page is one column of this width. */
+  --container-col: 39rem; /* 624px */
+
+  /* Warm neutrals — every gray is tinted toward the ember hue so the palette
+     reads as one family rather than accent-on-gray. */
+  --color-bg: oklch(0.982 0.0035 75);
+  --color-sunken: oklch(0.955 0.005 75);
+  --color-ink: oklch(0.215 0.008 65);
+  --color-ink-2: oklch(0.42 0.009 65);
+  /* Lightest tone still used for text. Measured at 4.6:1 on --color-bg, so every
+     label, year, and kicker clears WCAG AA at 11px. */
+  --color-ink-3: oklch(0.545 0.009 65);
+  /* Below AA on purpose — decorative only (separators, bullet glyphs). Never text. */
+  --color-ink-4: oklch(0.7 0.008 65);
+  --color-rule: oklch(0.215 0.008 65 / 0.1);
+  --color-rule-strong: oklch(0.215 0.008 65 / 0.18);
+  --color-accent: oklch(0.545 0.17 42);
+  --color-accent-soft: oklch(0.545 0.17 42 / 0.1);
+  --color-live: oklch(0.62 0.16 150);
+
+  /* Exponential ease-out only. Nothing bounces. */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --glass: oklch(0.982 0.0035 75 / 0.72);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-bg: oklch(0.165 0.005 70);
+  --color-sunken: oklch(0.215 0.006 70);
+  --color-ink: oklch(0.945 0.004 75);
+  --color-ink-2: oklch(0.78 0.006 75);
+  --color-ink-3: oklch(0.665 0.008 75);
+  --color-ink-4: oklch(0.5 0.008 75);
+  --color-rule: oklch(0.945 0.004 75 / 0.11);
+  --color-rule-strong: oklch(0.945 0.004 75 / 0.2);
+  --color-accent: oklch(0.735 0.145 52);
+  --color-accent-soft: oklch(0.735 0.145 52 / 0.14);
+  --color-live: oklch(0.72 0.15 152);
+
+  --glass: oklch(0.165 0.005 70 / 0.72);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Base
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@layer base {
+  html {
+    /* Anchor jumps land below the floating nav rather than under it. */
+    scroll-padding-top: 6rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Opt in per-interaction instead of globally, so a stray fragment link can
+     never smooth-scroll a reduced-motion user. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    overflow-wrap: break-word;
+  }
+
+  /* Warm the selection to the brand hue rather than leaving it browser blue. */
+  ::selection {
+    background: var(--color-accent-soft);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  /* Year columns and other tabular metadata. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Motion
+
+   Two mechanisms, both CSS-driven so no animation library ships:
+
+   1. `.enter`  — above-the-fold choreography, plays immediately on mount.
+   2. `.reveal` — everything else, flipped to `.is-in` by one shared
+                  IntersectionObserver (see src/lib/reveal.ts).
+
+   Both read `--i` for stagger index and animate only opacity + transform.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@layer components {
+  .enter,
+  .reveal {
+    --i: 0;
+    --lift: 10px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .enter {
+      opacity: 0;
+      animation: rise 620ms var(--ease-out-quart) forwards;
+      animation-delay: calc(var(--i) * 55ms + 40ms);
+    }
+
+    /* Scoped under `.js`, which the inline head script sets. The HTML is
+       prerendered, so without this a visitor whose JS fails would get a hero and
+       then nothing — `.reveal` is the one animation that needs a script to
+       finish, so it is the one that must degrade to plain visible content. */
+    .js .reveal {
+      opacity: 0;
+      transform: translate3d(0, var(--lift), 0);
+      transition:
+        opacity 620ms var(--ease-out-quart),
+        transform 620ms var(--ease-out-quart);
+      transition-delay: calc(var(--i) * 55ms);
+    }
+
+    .js .reveal.is-in {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, var(--lift), 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Theme toggle icons. Both are always in the DOM and crossfade purely off
+     `data-theme` — no React state, so the prerendered markup is already correct
+     and hydration has nothing to reconcile. */
+  .icon-sun,
+  .icon-moon {
+    position: absolute;
+    transition:
+      opacity 280ms var(--ease-out-quart),
+      transform 280ms var(--ease-out-quart);
+  }
+
+  :root[data-theme="light"] .icon-moon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.6);
+  }
+
+  :root[data-theme="dark"] .icon-sun {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.6);
+  }
+
+  /* Slow expanding halo behind a status dot. One dot, one 2.4s cycle — enough to
+     read as "live" without becoming something the eye has to keep dismissing. */
+  .pulse-dot {
+    position: relative;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pulse-dot::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: inherit;
+      animation: halo 2400ms var(--ease-out-quart) infinite;
+    }
+  }
+
+  @keyframes halo {
+    0% {
+      opacity: 0.5;
+      transform: scale(1);
+    }
+    70%,
+    100% {
+      opacity: 0;
+      transform: scale(3.4);
+    }
+  }
+
+  /* Link underline that grows from the left on hover — cheap, transform-only,
+     and it reads as a deliberate affordance rather than a default underline. */
+  .link {
+    position: relative;
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+
+  .link::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: -1px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.28;
+    transform-origin: left;
+    transition:
+      transform 260ms var(--ease-out-quart),
+      opacity 260ms var(--ease-out-quart);
+  }
+
+  @media (hover: hover) {
+    .link:hover::after {
+      opacity: 0.85;
+      transform: scaleY(2);
+    }
+  }
+
+  .link:focus-visible::after {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  nav,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 11pt;
+  }
+  .enter,
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #555;
+  }
+}

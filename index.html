@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Runs before first paint, so the theme never flashes and `.reveal` never
+         hides content on a browser that won't be running our JS. -->
+    <script>
+      (function () {
+        var el = document.documentElement;
+        el.classList.add("js");
+        try {
+          var s = localStorage.getItem("theme");
+          el.dataset.theme =
+            s === "dark" || s === "light"
+              ? s
+              : matchMedia("(prefers-color-scheme: dark)").matches
+                ? "dark"
+                : "light";
+        } catch (e) {
+          el.dataset.theme = "light";
+        }
+      })();
+    </script>
+
+    <title>Mitej Madan · Full Stack Engineer</title>
+    <meta
+      name="description"
+      content="Full stack engineer at TheAgentic, Mumbai. I build agent infrastructure and the interfaces that make it usable — TypeScript, React, Python, Postgres."
+    />
+    <link rel="canonical" href="https://mitejmadan.com/" />
+    <meta name="theme-color" content="#faf9f7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0c0b0a" media="(prefers-color-scheme: dark)" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Self-hosted, so the font is one same-origin request with no extra DNS/TLS handshake. -->
+    <link
+      rel="preload"
+      href="/fonts/instrument-sans-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Mitej Madan · Full Stack Engineer" />
+    <meta
+      property="og:description"
+      content="Full stack engineer at TheAgentic, Mumbai. I build agent infrastructure and the interfaces that make it usable."
+    />
+    <meta property="og:url" content="https://mitejmadan.com/" />
+    <meta property="og:image" content="https://mitejmadan.com/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@mitej1347" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Mitej Madan",
+        "jobTitle": "Full Stack Engineer",
+        "url": "https://mitejmadan.com/",
+        "address": { "@type": "PostalAddress", "addressLocality": "Mumbai", "addressCountry": "IN" },
+        "sameAs": [
+          "https://github.com/mitej23",
+          "https://x.com/mitej1347",
+          "https://www.linkedin.com/in/mitej-madan-06931b155/"
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
