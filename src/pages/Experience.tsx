@@ -1,7 +1,8 @@
-import { experience, profile } from "../content";
+import { education, experience, profile } from "../content";
 import { PageHead } from "../components/PageHead";
 import { Reveal } from "../components/Reveal";
 import { RoleRow } from "../components/RoleRow";
+import { Section } from "../components/Section";
 
 export function Experience() {
   return (
@@ -13,6 +14,30 @@ export function Experience() {
           <RoleRow key={r.company + r.start} role={r} i={i} />
         ))}
       </ul>
+
+      {/* Tighter than the default: the role list above already ends on its own
+          generous bottom padding, so the standard gap reads as a dead zone. */}
+      <Section label="Education" gap="mt-10 sm:mt-12">
+        <ul className="flex flex-col">
+          {education.map((d, i) => (
+            <Reveal
+              as="li"
+              key={d.qualification}
+              i={i}
+              className="border-t border-rule py-4 first:border-t-0 first:pt-0"
+            >
+              <div className="flex items-baseline gap-2.5">
+                <h3 className="text-[14.5px] leading-[1.3] font-semibold tracking-[-0.012em] text-ink">
+                  {d.qualification}
+                </h3>
+                <span className="tnum ml-auto shrink-0 text-[12px] text-ink-3">{d.year}</span>
+              </div>
+              <p className="mt-1 text-[13.5px] leading-[1.55] text-ink-2">{d.institution}</p>
+              {d.detail && <p className="tnum mt-0.5 text-[12.5px] text-ink-3">{d.detail}</p>}
+            </Reveal>
+          ))}
+        </ul>
+      </Section>
 
       {profile.resume && (
         <Reveal className="mt-8 border-t border-rule pt-6">

@@ -11,14 +11,21 @@ export function Section({
   children,
   className = "",
   id,
+  /**
+   * Top margin, as an explicit prop rather than something callers pass through
+   * `className` — two competing `mt-*` utilities have equal specificity, so
+   * which one wins would depend on stylesheet order.
+   */
+  gap = "mt-16 sm:mt-20",
 }: {
   label: string;
   children: ReactNode;
   className?: string;
   id?: string;
+  gap?: string;
 }) {
   return (
-    <section id={id} className={`mt-16 sm:mt-20 ${className}`}>
+    <section id={id} className={`${gap} ${className}`}>
       <Reveal
         as="h2"
         className="mb-6 flex items-center gap-2 text-[11px] leading-none font-semibold tracking-[0.09em] text-ink-3 uppercase"

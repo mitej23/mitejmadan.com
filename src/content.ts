@@ -2,10 +2,13 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * ALL SITE CONTENT LIVES HERE. Nothing else needs editing to change copy.
  *
- * Drafted from github.com/mitej23 (78 public repos) and TheAgentic. LinkedIn is
- * auth-walled (HTTP 999), so anything that could only have come from a résumé is
- * marked `TODO(mitej)`. Search this file for "TODO" to find every one of them.
- * The site renders correctly as-is — the TODOs are accuracy, not breakage.
+ * Sourced from Mitej_Madan_Resume (1).pdf (his own, marked outdated — it ends
+ * July 2023) plus github.com/mitej23. Anything the résumé didn't cover — the
+ * TheAgentic role above all, since it postdates the document — is marked
+ * `TODO(mitej)`. Search for "TODO" to find every one.
+ *
+ * Stack lists and project blurbs are kept to what there is evidence for. If
+ * something you use daily is missing, that's why — add it.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -25,17 +28,21 @@ export const profile = {
   // Two or three short paragraphs. First person, specific, no adjectives that
   // could apply to anyone.
   intro: [
-    // TODO(mitej): verify the numbers in this paragraph — years, project count,
-    // and user count are placeholders inferred from your GitHub history and
-    // TheAgentic's public work. Replace with figures you can stand behind.
-    "I build the parts of AI products that have to actually hold up: the services underneath, the data model in the middle, and the interface people touch. Right now that means agent infrastructure at TheAgentic, where a long-running agent has to stay legible to the person waiting on it.",
-    "Most of what I ship is TypeScript and Python — React and Node on one side, FastAPI and Postgres on the other. I like the problems where the hard part isn't the model call, it's everything around it: queues that retry correctly, migrations that don't lose history, and state that survives a refresh.",
+    "I build the parts of software that have to actually hold up: the services underneath, the data model in the middle, and the interface people touch. Right now that means agent infrastructure at TheAgentic.",
+    "Most of what I ship is TypeScript — React on one side, Node and Postgres on the other — with Python where it fits better. I'm drawn to the problems where the hard part isn't the feature, it's the correctness underneath: merging concurrent edits without a server picking winners, executing a scheduled flow per recipient, keeping state that survives a refresh.",
   ],
-  // Set to null to hide the résumé link in the nav.
-  resume: "/resume.pdf", // TODO(mitej): drop your PDF at public/resume.pdf, or set this to null.
+  /**
+   * TODO(mitej): pointing at nothing on purpose. You called the résumé outdated
+   * (it ends July 2023 and predates TheAgentic), so publishing it under a
+   * "Résumé" nav link would misrepresent you. Drop a current PDF at
+   * `public/resume.pdf` and set this to "/resume.pdf" to bring the link back.
+   */
+  resume: null as string | null,
 };
 
 export const links = {
+  // The résumé lists mitejmadan@gmail.com; using the work address the site is
+  // being built under. TODO(mitej): switch if you'd rather personal mail.
   email: "mitej@theagentic.ai",
   github: "https://github.com/mitej23",
   x: "https://x.com/mitej1347",
@@ -51,20 +58,20 @@ export type Capability = { title: string; body: string };
 
 export const capabilities: Capability[] = [
   {
-    title: "Backend and data",
-    body: "APIs, background workers, and the schema decisions that get expensive to change later. Postgres with real migrations, job queues that are idempotent because retries are inevitable, and auth I wrote myself often enough to know where the sharp edges are.",
-  },
-  {
     title: "Product frontend",
-    body: "React and TypeScript for interfaces with genuine state — canvases, editors, node graphs, dashboards that stream. The interesting work is usually keeping the UI honest while something slow happens behind it.",
+    body: "React and TypeScript for interfaces with genuine state — collaborative canvases, drag-and-drop flow editors, dashboards. Most of my work has been here, and the interesting part is usually keeping the UI honest while something slow or concurrent happens behind it.",
   },
   {
-    title: "Agent systems",
-    body: "Orchestration, tool calling, and the plumbing that turns a model into something a team can depend on. Most of the difficulty is observability and control: knowing what an agent did, and being able to stop it.",
+    title: "Backend and data",
+    body: "Node and Express over Postgres, with Prisma for the schema. Auth I've written from scratch often enough to know where the sharp edges are, and background execution — scheduled sends, conditional delays, retries — that has to stay correct when it runs unattended.",
+  },
+  {
+    title: "Real-time and correctness",
+    body: "CRDTs with Y.js for conflict-free collaborative editing, and WebSockets where state has to move as it changes. This is the work I like most: getting concurrent writes to converge without a server arbitrating who wins.",
   },
   {
     title: "Shipping end to end",
-    body: "I take features from a rough problem statement to something deployed. That includes the unglamorous parts — CI, environments, migrations in production, and the follow-up fixes nobody scoped.",
+    body: "I take features from a rough problem statement to something deployed, across whatever the stack turns out to be — I've shipped in Laravel and Flask and React Native when that was the right answer, not just the familiar one.",
   },
 ];
 
@@ -80,15 +87,15 @@ export type Project = {
   stack: string[];
   href?: string;
   live?: string;
-  /** Renders a small ember "live" dot. Use for things people can actually open. */
+  /** Renders a small "live" dot. Use for things people can actually open. */
   isLive?: boolean;
 };
 
 export const projects: Project[] = [
   {
     // TODO(mitej): CortexON is TheAgentic's open-source multi-agent system
-    // (450+ stars, 75+ forks). Confirm your role and rewrite this in your own
-    // words — or delete the entry if you weren't on it.
+    // (450+ stars, 75+ forks). It postdates the résumé, so I can't confirm your
+    // role — rewrite this in your own words, or delete the entry.
     name: "CortexON",
     year: "2025",
     blurb:
@@ -98,16 +105,33 @@ export const projects: Project[] = [
     isLive: true,
   },
   {
+    name: "Boardly",
+    year: "2024",
+    blurb:
+      "Collaborative canvas for brainstorming, built on CRDTs so concurrent edits converge without a server deciding who wins. Y.js handles conflict resolution; JWT handles auth and authorization.",
+    stack: ["React", "TypeScript", "Y.js", "Express", "Prisma", "React Query"],
+    href: "https://github.com/mitej23/boardly",
+  },
+  {
     name: "Campaigns",
     year: "2024",
     blurb:
-      "Email campaign automation built around a visual flow editor — you compose a sequence of sends, waits, and conditions on a canvas, and the backend executes it per recipient with delivery and open tracking.",
-    stack: ["TypeScript", "React Flow", "Node", "Postgres"],
+      "Email automation built around a drag-and-drop editor: you compose a campaign as a flow of sends, delays, and conditions, and the backend executes it per recipient — including branches that depend on what the recipient did.",
+    stack: ["React", "Express", "Postgres", "shadcn/ui"],
     href: "https://github.com/mitej23/Campaigns",
+  },
+  {
+    name: "College Data Collection System",
+    year: "2022",
+    blurb:
+      "Centralised storage system for a college, with complex filtering and bulk import/export. Files live in the institution's own OneDrive via Azure and MSAL rather than a bucket I'd have to manage.",
+    stack: ["Laravel", "Flask", "Azure OneDrive", "MSAL"],
+    href: "https://github.com/mitej23/College-Management-System",
   },
   {
     name: "Alembic Schema Viewer",
     year: "2026",
+    // TODO(mitej): the repo has no description — this is my reading of the code.
     blurb:
       "Reads an Alembic migration history and renders the schema it produces, so you can see how tables and relationships evolved across revisions instead of reading migration files in order.",
     stack: ["Python", "Alembic", "SQLAlchemy"],
@@ -116,58 +140,50 @@ export const projects: Project[] = [
   {
     name: "LLM Math Visualiser",
     year: "2026",
+    // TODO(mitej): also undescribed in the repo — correct if I've read it wrong.
     blurb:
       "Walks through the arithmetic inside a transformer forward pass — embeddings, attention, and projections — as visual steps rather than notation, built to make the shapes concrete.",
     stack: ["Python"],
     href: "https://github.com/mitej23/llm-math-visualiser",
   },
   {
+    name: "Food Ordering System",
+    year: "2022",
+    // No `href`: github.com/mitej23/restaurant-app returns 404, so the résumé's
+    // link is dead — renamed, deleted, or private.
+    // TODO(mitej): add the current repo URL, or drop this entry.
+    blurb:
+      "Mobile food ordering app with live delivery tracking — WebSockets push a courier's location to the customer as it changes, with Firebase behind it.",
+    stack: ["React Native", "Redux", "Firebase", "WebSockets"],
+  },
+  {
     name: "Canvas Editor",
     year: "2024",
+    // TODO(mitej): undescribed repo — my reading of the code.
     blurb:
       "SVG-based canvas editor with selection, transform handles, and layer ordering, written from scratch to understand how tools like Figma model geometry and hit-testing.",
     stack: ["TypeScript", "SVG"],
     href: "https://github.com/mitej23/canvas-editor",
   },
   {
-    name: "Boardly",
-    year: "2024",
-    blurb:
-      // TODO(mitej): the repo has no description — one sentence on what it does.
-      "Collaborative whiteboard with real-time multiplayer cursors and shared board state.",
-    stack: ["TypeScript"],
-    href: "https://github.com/mitej23/boardly",
-  },
-  {
     name: "manage.io",
     year: "2024",
     blurb:
-      "Portfolio management for mutual fund agents — client holdings, allocations, and returns across a book of investors, with the reporting an agent needs to actually service them.",
+      "Portfolio management for mutual fund agents — client holdings, allocations, and returns across a book of investors, with the reporting an agent needs to service them.",
     stack: ["JavaScript", "React", "Node"],
     href: "https://github.com/mitej23/manage.io",
-  },
-  {
-    name: "auth-api",
-    year: "2024",
-    blurb:
-      "Authentication service built on rotating refresh and short-lived access tokens, written to get session invalidation and token reuse detection right rather than to reach for a provider.",
-    stack: ["JavaScript", "Node", "JWT"],
-    href: "https://github.com/mitej23/auth-api",
   },
 ];
 
 /* ── Experience ─────────────────────────────────────────────────────────────
-   TODO(mitej): this is the section I could not source — LinkedIn blocks
-   scraping. Fill in real companies, titles, and dates. The two entries below
-   are inferred scaffolding: TheAgentic from your GitHub org, and one earlier
-   role because your account dates to 2020. Delete or correct freely.
+   `end: "Present"` renders with a live dot.
    ────────────────────────────────────────────────────────────────────────── */
 
 export type Role = {
   company: string;
   title: string;
   start: string;
-  end: string; // "Present" renders with a live dot
+  end: string;
   href?: string;
   points: string[];
 };
@@ -176,40 +192,72 @@ export const experience: Role[] = [
   {
     company: "TheAgentic",
     title: "Full Stack Engineer",
-    start: "TODO", // TODO(mitej): e.g. "Sep 2024"
+    // TODO(mitej): the résumé predates this role entirely, so the start date and
+    // all three bullets below are still mine, not yours. This is the last
+    // significant placeholder on the site — concrete beats impressive, so name
+    // the system and what changed because of it.
+    start: "TODO",
     end: "Present",
     href: "https://theagentic.ai",
     points: [
-      // TODO(mitej): replace all of these with what you actually shipped.
-      // Concrete beats impressive — name the system and the outcome.
       "Build and maintain agent orchestration services and the APIs product surfaces consume.",
       "Own the data layer: schema design, migrations, and query performance as usage grew.",
       "Ship the frontend for long-running agent runs — streaming output, intermediate state, and cancellation.",
     ],
   },
   {
-    // TODO(mitej): real company, title, and dates — or delete this entry.
-    company: "TODO — earlier role",
-    title: "Software Engineer",
-    start: "TODO",
-    end: "TODO",
+    company: "Idigitize Infotech LLP",
+    title: "Front-End Developer",
+    start: "Dec 2022",
+    end: "Jul 2023",
     points: [
-      "TODO(mitej): what you built, and what it changed.",
+      "Built the admin and user dashboards for CapitalIdeaz.in in React.",
+      "Shipped several e-commerce admin panels in Next.js, factored around reusable components rather than per-client rewrites.",
+      "Worked across school management and rent management systems.",
+      "Built landing pages to spec with the UI/UX designers.",
     ],
   },
 ];
 
+/* ── Education ──────────────────────────────────────────────────────────────
+   Rendered under Experience. Both entries are from the résumé.
+   ────────────────────────────────────────────────────────────────────────── */
+
+export type Degree = {
+  qualification: string;
+  institution: string;
+  year: string;
+  detail?: string;
+};
+
+export const education: Degree[] = [
+  {
+    qualification: "Master of Computer Applications",
+    institution: "NMIMS Mukesh Patel School of Technology Management & Engineering",
+    year: "2024",
+    detail: "CGPA 3.87 / 4",
+  },
+  {
+    qualification: "BSc Information Technology",
+    institution: "Narsee Monjee College of Commerce & Economics, Mumbai University",
+    year: "2023",
+    detail: "CGPA 8.55 / 10",
+  },
+];
+
 /* ── Stack ──────────────────────────────────────────────────────────────────
-   Grouped so it reads as a set of decisions, not a keyword dump. Keep each
-   group short — a list of twenty tools says nothing.
+   Only what there's evidence you've shipped with. Grouped so it reads as a set
+   of decisions rather than a keyword dump.
    ────────────────────────────────────────────────────────────────────────── */
 
 export const stack: { group: string; items: string[] }[] = [
-  { group: "Languages", items: ["TypeScript", "Python", "SQL", "C++"] },
-  { group: "Frontend", items: ["React", "Vite", "Tailwind", "TanStack Query"] },
-  { group: "Backend", items: ["Node", "Express", "FastAPI", "Postgres", "Redis"] },
-  { group: "Infra", items: ["Docker", "AWS", "Vercel", "GitHub Actions"] },
-  // TODO(mitej): prune anything here you wouldn't want to be interviewed on.
+  { group: "Languages", items: ["TypeScript", "JavaScript", "Python", "SQL"] },
+  { group: "Frontend", items: ["React", "Next.js", "React Native", "Tailwind", "React Query"] },
+  { group: "Backend", items: ["Node", "Express", "Postgres", "Prisma", "Flask"] },
+  { group: "Real-time", items: ["Y.js / CRDTs", "WebSockets"] },
+  { group: "Cloud", items: ["Firebase", "Azure", "Vercel"] },
+  // TODO(mitej): add what you use at TheAgentic that isn't here — I removed my
+  // earlier guesses (FastAPI, Redis, Docker, AWS) rather than assert them.
 ];
 
 /* ── Off the clock ──────────────────────────────────────────────────────────
@@ -217,8 +265,8 @@ export const stack: { group: string; items: string[] }[] = [
    people remember. Generic hobbies are worse than nothing.
    ────────────────────────────────────────────────────────────────────────── */
 
-// TODO(mitej): rewrite this in your own words — it's the one section I have no
-// basis for, and a placeholder here is more obvious to a reader than anywhere
-// else on the site.
+// TODO(mitej): the résumé had nothing personal in it, so this is still mine and
+// still the section with no basis behind it. Rewrite it or delete it — a
+// placeholder reads more obviously here than anywhere else on the site.
 export const offClock =
   "Away from the editor I read a lot of systems writing, take things apart to see how they were put together, and lose evenings to problems nobody asked me to solve.";

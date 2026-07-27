@@ -14,26 +14,34 @@ npm run typecheck
 ## Before this goes live
 
 All copy lives in **`src/content.ts`** — nothing else needs editing to change text.
-It was drafted from your public GitHub and TheAgentic; LinkedIn blocks scraping
-(HTTP 999), so anything that could only have come from a résumé is marked. Find
-them with:
+It's drawn from `Mitej_Madan_Resume (1).pdf` and `github.com/mitej23`. The résumé
+ends July 2023 and predates TheAgentic, so everything after that point is still
+unverified and marked. Find them with:
 
 ```bash
 grep -n "TODO" src/content.ts
 ```
 
-In rough priority order:
+In priority order:
 
 | # | What | Why it matters |
 |---|------|----------------|
-| 1 | **`experience`** — real companies, titles, dates | Currently reads `TODO — earlier role` and `TODO — Present`. This is the most visible placeholder on the site. |
-| 2 | **`offClock`** | Pure invention on my part. A generic hobbies line is worse than no section. |
-| 3 | **`profile.intro`** | Verify the claims and framing. |
-| 4 | **CortexON entry** in `projects` | Confirm your actual role, or delete the entry. |
-| 5 | **`Boardly` blurb** | The repo has no description, so I guessed "collaborative whiteboard". |
-| 6 | **`profile.resume`** | Drop a PDF at `public/resume.pdf`, or set to `null` to hide the nav link. |
-| 7 | **`stack`** | Prune anything you wouldn't want to be interviewed on. |
-| 8 | **`profile.avatar`** | Optional. `null` renders a monogram; set to e.g. `"/avatar.webp"` for a photo. |
+| 1 | **TheAgentic role** — start date + all three bullets | The résumé doesn't cover it, so the date renders literally as `TODO — Present`. Easily the most visible placeholder left. |
+| 2 | **`offClock`** | Invented. The résumé had nothing personal in it. A generic hobbies line is worse than deleting the section. |
+| 3 | **CortexON entry** | Postdates the résumé, so your role is unconfirmed. Rewrite or delete. |
+| 4 | **Food Ordering System link** | The résumé's URL (`mitej23/restaurant-app`) 404s — renamed, deleted, or private. The entry currently renders with no link at all. |
+| 5 | **`profile.resume`** | Deliberately `null`, which hides the nav link. You called the PDF outdated, and publishing it under "Résumé" would misrepresent you. Drop a current one at `public/resume.pdf` and set the path to restore the link. |
+| 6 | **Three project blurbs** | `db-alembic-schema-viewer`, `llm-math-visualiser`, and `canvas-editor` have no repo descriptions, so those blurbs are my reading of the code. |
+| 7 | **`stack`** | Evidence-based only. I removed my earlier guesses (FastAPI, Redis, Docker, AWS) rather than assert them — add what you actually use at TheAgentic. |
+| 8 | **`links.email`** | Set to the work address. Switch if you'd rather personal mail (the résumé lists `mitejmadan@gmail.com`). |
+| 9 | **`profile.avatar`** | Optional. `null` renders a monogram; set to e.g. `"/avatar.webp"` for a photo. |
+
+Verified from the résumé and needing no attention: the Idigitize Infotech role,
+education, and the Boardly / Campaigns / College Data Collection blurbs.
+
+Two things from the résumé I left off on purpose: the certifications (Coursera
+Neural Networks, Blue Array SEO) and the HSC entry — neither earns its space
+next to the rest. Add them back if you disagree.
 
 Then update the domain: `SITE` in `scripts/prerender.mjs`, and the `canonical` /
 `og:*` / JSON-LD URLs in `index.html`.
@@ -103,15 +111,15 @@ remounts the tree and replays the entrance.
 
 Checked against the production build in headless Chromium:
 
-- **Contrast** — 63 text nodes, 0 below WCAG AA in either theme (lowest 4.72:1
+- **Contrast** — 70 text nodes, 0 below WCAG AA in either theme (lowest 4.72:1
   light, 6.31:1 dark). `--color-ink-4` is below AA by design and is decorative
   only; every text token is at or above `--color-ink-3`.
 - **`prefers-reduced-motion: reduce`** — no element left below full opacity.
-- **JavaScript disabled** — all 21 `.reveal` elements visible, full text content
+- **JavaScript disabled** — all 22 `.reveal` elements visible, full text content
   present.
 - **Keyboard** — skip link first, logical tab order, 2px visible focus ring on
   every interactive element.
-- **320px viewport** — nav pill is 304px, clears the narrowest common viewport
+- **320px viewport** — nav pill is 240px, clears the narrowest common viewport
   without clipping (it's centred by transform, so overflow would cut both ends).
 - No console errors or hydration warnings.
 
