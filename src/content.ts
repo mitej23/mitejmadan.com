@@ -286,7 +286,8 @@ export const photos: Photo[] = [
     w: 1125,
     h: 1500,
     alt: "Two monkeys running along a branch of a broad tree that frames a green valley and distant fields.",
-    lqip: "data:image/webp;base64,UklGRgABAABXRUJQVlA4IPQAAAAwBgCdASoUABsAPt1aqU6opKOiMBgIARAbiWcABmgaQJmkJ/OP9ke+gr086v29xeUnHWuX9bgggLkAAP7TvHZzVlPWmEdF5rFR1E8kHhAmH1pB5vYrwKw9EIQh4hh4W4R+OxS2SmtbP5sZxRvok+VeFfP9Y4Ce0tDZfSVjKgD1c3ZAPghGODqn1pT4t245MuuA62301d5JoN0WcoI3rEJsTsAQ0ndW/kCIsNEXt/oe0W3nU3tWUXLjeJH9W6JeUgB4yZ89r9vOtHBsArMI5TXvo3k8VGBMf99GZ5RSrmcFFgsYZ9XuqBpwD8Ul9pZwX3xne8AA",
+    lqip:
+      "data:image/webp;base64,UklGRvYAAABXRUJQVlA4IOoAAADQBQCdASoUABsAPt1irE8opaQiKAqpEBuJYwDImywTnIW/pmJ/PAfC+r1LIQ/rgyN2QJSk+KAgAP7sJ8262QtO98FTUH39OQqjwVdHzUyWxZ1R55n+o9nNTO1E2rMOi/caiOTCXgIO02tEc6BAu8kjs1ZfNRdLUcNoCrZw8KAui9/BddX9l48SOTGlY4hx9AjRs2tpQD/bluyHB9wCKcwbr19NiNVs7U1Qk0VhRXLnBO0RlWI1covbdQkATekpUkSvSDhotm/2fOzUVDhAWlh/u941tMJkKtUcUMIthmZ5xr/unQHRayrtAAA=",
   },
   {
     slug: "fisherman-dusk",
