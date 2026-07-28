@@ -256,7 +256,7 @@ export function Overworld() {
 
           {near && !pages && (
             <p className="ow-ui pointer-events-none absolute inset-x-0 bottom-24 text-center text-[12px] tracking-[0.06em] text-white/80 uppercase">
-              Press Space to read
+              {near?.startsWith("door:") ? "Walk in" : "Press Space to read"}
             </p>
           )}
 

@@ -231,6 +231,15 @@ export async function mountGame(
     return readableInRoom(ROOMS[inside], x, y);
   }
 
+  /** A door the player is standing on, or facing, in the town. */
+  function doorNearby(): Building["id"] | null {
+    if (inside) return null;
+    const here = doors.get(ty * MAP_W + tx);
+    if (here) return here;
+    const [fx, fy] = facingTile();
+    return doors.get(fy * MAP_W + fx) ?? null;
+  }
+
   /** A / Space / Enter: act on whatever the player is standing on or facing. */
   function interact() {
     if (inside) {
@@ -251,6 +260,14 @@ export async function mountGame(
   /** Tell the UI when something readable is in front of us, so it can prompt. */
   let lastNear: string | null = null;
   function reportNear() {
+    const door = doorNearby();
+    if (door) {
+      if (lastNear !== `door:${door}`) {
+        lastNear = `door:${door}`;
+        opts.onNear?.(lastNear);
+      }
+      return;
+    }
     const [fx, fy] = facingTile();
     const topic = readableAt(fx, fy);
     if (topic !== lastNear) {

@@ -40,8 +40,19 @@ export type Building = {
   /** Footprint in tiles. Sprites are bottom-aligned to it. */
   tw: number;
   th: number;
-  /** Door column, as an offset from tx. Standing here and pressing A opens it. */
-  door: number;
+  /**
+   * Door columns, as offsets from tx, measured by cropping each sprite's bottom
+   * row at 8x and reading where the drawn door actually sits:
+   *
+   *   theagentic  offsets 1.5-2.5  -> [1, 2]
+   *   idigitize   offsets 2.5-3.5  -> [2, 3]
+   *   education   offsets 1.7-2.5  -> [1, 2]
+   *
+   * Two tiles wide because the doors straddle a tile boundary, and because a
+   * one-tile entrance on a one-tile path means drifting a single column off
+   * leaves you facing blank wall with no way in and no hint why.
+   */
+  door: [number, number];
 };
 
 /**
@@ -49,9 +60,9 @@ export type Building = {
  * wide), the previous employer the smallest (5).
  */
 export const BUILDINGS: Building[] = [
-  { id: "theagentic", src: [120, 31, 96, 81], tx: 15, ty: 3, tw: 6, th: 5, door: 3 },
-  { id: "idigitize", src: [24, 43, 80, 69], tx: 5, ty: 12, tw: 5, th: 5, door: 2 },
-  { id: "education", src: [22, 132, 83, 77], tx: 25, ty: 11, tw: 6, th: 5, door: 2 },
+  { id: "theagentic", src: [120, 31, 96, 81], tx: 15, ty: 3, tw: 6, th: 5, door: [1, 2] },
+  { id: "idigitize", src: [24, 43, 80, 69], tx: 5, ty: 12, tw: 5, th: 5, door: [2, 3] },
+  { id: "education", src: [22, 132, 83, 77], tx: 25, ty: 11, tw: 6, th: 5, door: [1, 2] },
 ];
 
 /** bush.png is one 48×48 sprite with the bush centred; this is its content rect. */
@@ -84,9 +95,15 @@ function buildPath(): Set<number> {
 
   for (let y = 18; y <= MAP_H - 2; y++) add(SPAWN.x, y); // gate → plaza
   for (let x = 7; x <= 28; x++) add(x, 18); // the plaza itself
-  for (let y = 8; y <= 18; y++) add(18, y); // main street to TheAgentic
+  // Runs at x=17 because that is where TheAgentic's door is. It used to run at
+  // x=18, which put the street against blank wall a tile to the right of the door.
+  for (let y = 8; y <= 18; y++) add(17, y);
+  add(16, 8); // the door straddles two tiles, so the approach covers both
   for (let y = 17; y <= 18; y++) add(7, y); // spur: previous employer
+  add(8, 17);
+
   for (let y = 16; y <= 18; y++) add(27, y); // spur: education
+  add(26, 16);
   return p;
 }
 
@@ -118,11 +135,12 @@ export function buildCollision() {
         solid[at(x, y)] = 1;
       }
     }
-    // The door is the one tile you can stand on, on the building's bottom row.
-    const dx = b.tx + b.door;
+    // The doorway is the stretch of the bottom row you can stand on.
     const dy = b.ty + b.th - 1;
-    solid[at(dx, dy)] = 0;
-    doors.set(at(dx, dy), b.id);
+    for (const off of b.door) {
+      solid[at(b.tx + off, dy)] = 0;
+      doors.set(at(b.tx + off, dy), b.id);
+    }
   }
 
   for (const [x, y] of BUSHES) solid[at(x, y)] = 1;
