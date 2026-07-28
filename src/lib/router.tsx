@@ -30,7 +30,7 @@ function snapshot() {
 
 /**
  * Which path the build-time prerender is currently rendering. Only ever set by
- * the SSR entry — in the browser this stays at "/" and is never read.
+ * the SSR entry.
  */
 let renderPath = "/";
 
@@ -38,8 +38,26 @@ export function setRenderPath(path: string) {
   renderPath = path;
 }
 
+/**
+ * React calls this during client hydration as well as on the server, so it has to
+ * return what the server actually rendered — not a server-only default.
+ *
+ * It used to return `renderPath` unconditionally, which is "/" in the browser
+ * because only the SSR entry ever sets it. That made the first client render of
+ * every prerendered sub-page believe it was on the home page: the nav marked the
+ * wrong link current, the home-only hero rendered, hydration mismatched, and
+ * React threw the prerendered tree away and rebuilt the document client-side.
+ * The prerender was doing nothing for three of the four routes.
+ *
+ * In the browser the answer is just the URL the document was served at, which is
+ * by construction the path it was prerendered for.
+ */
+function serverSnapshot() {
+  return typeof document === "undefined" ? renderPath : location.pathname;
+}
+
 export function usePath(): string {
-  return useSyncExternalStore(subscribe, snapshot, () => renderPath);
+  return useSyncExternalStore(subscribe, snapshot, serverSnapshot);
 }
 
 export function navigate(to: string, replace = false) {

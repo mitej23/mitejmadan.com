@@ -5,6 +5,7 @@ import { Nav } from "./components/Nav";
 import { Footer } from "./components/Footer";
 import { HeroWash } from "./components/HeroWash";
 import { Overworld } from "./components/Overworld";
+import { PixelMode } from "./components/PixelMode";
 import { Home } from "./pages/Home";
 import { Projects } from "./pages/Projects";
 import { Experience } from "./pages/Experience";
@@ -59,6 +60,7 @@ export function App() {
       </div>
 
       <Overworld />
+      <PixelMode />
     </>
   );
 }

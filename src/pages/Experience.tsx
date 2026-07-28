@@ -27,7 +27,7 @@ export function Experience() {
 
         <ul className="flex flex-col">
           {systems.map((s, i) => (
-            <SystemRow key={s.title} system={s} i={i} />
+            <SystemRow key={s.title} system={s} i={i} total={systems.length} />
           ))}
         </ul>
       </Section>

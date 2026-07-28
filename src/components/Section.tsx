@@ -34,7 +34,10 @@ export function Section({
         <span className="shrink-0 text-[11px] leading-none font-semibold tracking-[0.09em] text-ink-3 uppercase">
           {label}
         </span>
-        <span aria-hidden className="h-px flex-1 bg-rule" />
+        {/* Draws itself out from the label as the section arrives — the same
+            left-anchored scale the keyword underlines use, so it reads as part
+            of one vocabulary rather than a second idea. */}
+        <span aria-hidden className="sect-rule h-px flex-1 bg-rule" />
       </Reveal>
       {children}
     </section>

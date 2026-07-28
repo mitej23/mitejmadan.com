@@ -248,6 +248,58 @@
 
   /* Slow expanding halo behind a status dot. One dot, one 2.4s cycle — enough to
      read as "live" without becoming something the eye has to keep dismissing. */
+  /**
+   * The pixel-mode switch. A switch rather than a plain button because it reports a
+   * standing state, not a one-shot action — so it says so both visually and to
+   * assistive tech (role="switch" + aria-checked).
+   *
+   * The knob is the only thing that moves, and only on `transform`. 200ms sits in
+   * the middle of the budget for a control of this kind: long enough to read as a
+   * throw rather than a jump, short enough not to lag behind the click.
+   */
+  .pxl-switch[aria-checked="true"] {
+    border-color: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+
+  .pxl-track {
+    position: relative;
+    display: block;
+    width: 30px;
+    height: 17px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: var(--color-rule-strong);
+    transition: background-color 200ms var(--ease-out-quart);
+  }
+
+  .pxl-switch[aria-checked="true"] .pxl-track {
+    background: var(--color-accent);
+  }
+
+  .pxl-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    display: block;
+    width: 13px;
+    height: 13px;
+    border-radius: 999px;
+    background: var(--color-bg);
+    transition: transform 200ms var(--ease-out-quart);
+  }
+
+  .pxl-switch[aria-checked="true"] .pxl-knob {
+    transform: translateX(13px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pxl-track,
+    .pxl-knob {
+      transition-duration: 1ms;
+    }
+  }
+
   .pulse-dot {
     position: relative;
   }
@@ -348,6 +400,82 @@
   @media (prefers-reduced-motion: no-preference) {
     .disc[open] > .disc-body {
       animation: disc-open 320ms var(--ease-out-quart);
+    }
+
+    /**
+     * Animate the height, not just the contents.
+     *
+     * The body used to fade and slide in while the container's height snapped,
+     * so opening one system teleported everything below it. `interpolate-size`
+     * makes `auto` an interpolable value and `::details-content` is the box to
+     * put it on; `content-visibility` has to ride along as a discrete property
+     * or the content pops in before the box has finished growing.
+     *
+     * ::details-content is Chrome/Edge-only today. Elsewhere this rule is
+     * ignored and the previous fade-in behaviour is what you get — worse, but
+     * not broken, which is the right way round for a progressive enhancement.
+     */
+    :root {
+      interpolate-size: allow-keywords;
+    }
+
+    .disc::details-content {
+      height: 0;
+      overflow: clip;
+      transition:
+        height 380ms var(--ease-out-quart),
+        content-visibility 380ms allow-discrete;
+    }
+
+    .disc[open]::details-content {
+      height: auto;
+    }
+  }
+
+  /**
+   * Section rules and the role timeline draw themselves in as the block arrives,
+   * reusing the keyword-underline idiom rather than inventing a second one.
+   *
+   * Both default to drawn and are only hidden under `.js`: without JS `.reveal`
+   * never gets `.is-in`, and a rule that never arrives is worse than a static
+   * one. Same reasoning as `.kw` and `.reveal` itself.
+   */
+  .sect-rule,
+  .tl-line {
+    transform-origin: top left;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .js .sect-rule {
+      transform: scaleX(0);
+      transition: transform 620ms var(--ease-out-quart) 120ms;
+    }
+
+    .js .reveal.is-in .sect-rule {
+      transform: scaleX(1);
+    }
+
+    .js .tl-line {
+      transform: scaleY(0);
+      transition: transform 700ms var(--ease-out-quart) 80ms;
+    }
+
+    .js .reveal.is-in .tl-line {
+      transform: scaleY(1);
+    }
+
+    /* The node lands after its line has reached it. */
+    .js .tl-node {
+      opacity: 0;
+      transform: scale(0.4);
+      transition:
+        opacity 280ms var(--ease-out-quart) 380ms,
+        transform 280ms var(--ease-out-quart) 380ms;
+    }
+
+    .js .reveal.is-in .tl-node {
+      opacity: 1;
+      transform: none;
     }
   }
 
@@ -545,5 +673,156 @@
     content: " (" attr(href) ")";
     font-size: 9pt;
     color: #555;
+  }
+}
+
+/**
+ * Pixel mode lives outside @layer on purpose.
+ *
+ * Tailwind emits its utilities into `@layer utilities`, which the cascade places
+ * after `@layer components` — so a layered `font-size` here loses to every
+ * `text-[14px]` on the page no matter how specific it is. That silently ate the
+ * first version of this block: the faces swapped but every size stayed put,
+ * because nothing sets `font-family` as a utility and everything sets size as one.
+ * Unlayered rules outrank all layered ones, so this needs no !important.
+ */
+/* Screen only. A printed résumé has to be plain, legible type — scoping the
+   whole mode here is cleaner than unwinding each rule for print. */
+@media screen {
+  /**
+   * Pixel mode.
+   *
+   * Everything here hangs off one attribute on <html>, so switching it costs a
+   * style recalc and nothing else — no filter, no cloned DOM, no per-frame work.
+   *
+   * The faces are the two the overworld already ships, used the same way it uses
+   * them: Pixelify Sans for headings and UI, VT323 for prose. Legibility in a pixel
+   * face is bought with size, so body copy steps up rather than swapping face —
+   * at its normal 14px a pixel font has too few pixels per glyph to resolve.
+   *
+   * Antialiasing is switched off on purpose. A smoothed pixel font is the one
+   * detail that gives the whole thing away.
+   */
+  [data-pixel="on"] {
+    --pxl-cell: 3px;
+  }
+
+  [data-pixel="on"] body {
+    font-family: "Pixelify Sans", ui-monospace, monospace;
+    /* Single-value syntax on purpose: it means exactly "ex-height ratio" and is
+       supported far more widely than the two-value `ex-height <n>` form. It is an
+       inherited property, so setting it here scales every band on the page and the
+       prose rule below only has to state its own ratio. */
+    font-size-adjust: 0.5;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: unset;
+    font-smooth: never;
+  }
+
+  /**
+   * Prose runs in VT323; headings and small-caps labels keep Pixelify, which holds
+   * its shape at display sizes.
+   *
+   * The size comes from `font-size-adjust`, not from overriding each declared size.
+   * VT323 carries a much smaller x-height per em than Instrument Sans, so at an
+   * identical px value it reads far smaller — which is exactly what
+   * `font-size-adjust` exists to correct. Normalising to Instrument Sans's own
+   * ex-height ratio scales every size band by the same amount, so the type
+   * hierarchy the page already has survives intact. Hand-written per-band sizes
+   * would have to be re-derived every time a size changes upstream.
+   */
+  [data-pixel="on"] p,
+  [data-pixel="on"] li,
+  [data-pixel="on"] dd,
+  [data-pixel="on"] blockquote,
+  [data-pixel="on"] summary {
+    font-family: "VT323", ui-monospace, monospace;
+    font-size-adjust: 0.515;
+    line-height: 1.62;
+    letter-spacing: 0.012em;
+  }
+
+  /* Headings state their face explicitly: a role sits inside an <li>, so without
+     this a company name would inherit the prose face from its list item. */
+  [data-pixel="on"] h1,
+  [data-pixel="on"] h2,
+  [data-pixel="on"] h3,
+  [data-pixel="on"] h4,
+  [data-pixel="on"] dt {
+    font-family: "Pixelify Sans", ui-monospace, monospace;
+    font-size-adjust: 0.5;
+  }
+
+  [data-pixel="on"] :is(h1, h2, h3, h4) {
+    letter-spacing: 0.01em;
+  }
+
+  /* Nothing in a 16px tile grid is round, blurred, or soft-shadowed. */
+  [data-pixel="on"] *,
+  [data-pixel="on"] *::before,
+  [data-pixel="on"] *::after {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  [data-pixel="on"] img {
+    image-rendering: pixelated;
+  }
+
+  /* Hairlines become the thickness of a tile edge, so they read as drawn rather
+     than as a browser artefact. */
+  [data-pixel="on"] .sect-rule,
+  [data-pixel="on"] .tl-line {
+    background: var(--color-ink-3);
+  }
+
+  /**
+   * The LCD grid. Kept deliberately faint: it has to suggest a pixel matrix
+   * without eating the contrast of the text underneath, and every text node on
+   * every route is measured against WCAG AA with this layer switched on.
+   */
+  [data-pixel="on"] body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    /* Above the nav (50) so the whole screen reads as one panel, below the
+       overworld (60), which is already pixel art and must not be gridded twice. */
+    z-index: 55;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        oklch(0.2 0.01 65 / 0.055) 0 1px,
+        transparent 1px var(--pxl-cell)
+      ),
+      repeating-linear-gradient(
+        90deg,
+        oklch(0.2 0.01 65 / 0.035) 0 1px,
+        transparent 1px var(--pxl-cell)
+      );
+  }
+
+  [data-theme="dark"][data-pixel="on"] body::after {
+    background:
+      repeating-linear-gradient(
+        0deg,
+        oklch(0.02 0 0 / 0.16) 0 1px,
+        transparent 1px var(--pxl-cell)
+      ),
+      repeating-linear-gradient(
+        90deg,
+        oklch(0.02 0 0 / 0.1) 0 1px,
+        transparent 1px var(--pxl-cell)
+      );
+  }
+
+  /* The grid is texture, not content: a reader who has asked for less visual
+     noise gets the pixel type without the matrix over it. */
+  @media (prefers-reduced-transparency: reduce) {
+    [data-pixel="on"] body::after {
+      display: none;
+    }
   }
 }

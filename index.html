@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Runs before first paint, so the theme never flashes and `.reveal` never
-         hides content on a browser that won't be running our JS. -->
+    <!-- Runs before first paint, so neither the theme nor pixel mode flashes, and
+         `.reveal` never hides content on a browser that won't be running our JS. -->
     <script>
       (function () {
         var el = document.documentElement;
@@ -18,8 +18,10 @@
               : matchMedia("(prefers-color-scheme: dark)").matches
                 ? "dark"
                 : "light";
+          el.dataset.pixel = localStorage.getItem("pixel-mode") === "on" ? "on" : "off";
         } catch (e) {
           el.dataset.theme = "light";
+          el.dataset.pixel = "off";
         }
       })();
     </script>

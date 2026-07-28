@@ -10,12 +10,29 @@ import { Rich } from "./Rich";
  * gets domain, title, one paragraph and the stack; expanded, they get the
  * engineering. Native <details>, so it works with JS off.
  */
-export function SystemRow({ system, i }: { system: System; i: number }) {
+export function SystemRow({
+  system,
+  i,
+  total,
+}: {
+  system: System;
+  i: number;
+  total: number;
+}) {
   return (
     <Reveal as="li" i={i} className="border-t border-rule py-7 first:border-t-0 first:pt-1">
-      <p className="mb-1.5 text-[11px] leading-none font-semibold tracking-[0.07em] text-ink-3 uppercase">
-        {system.domain}
-      </p>
+      {/* The ordinal is the one thing eight near-identical rows couldn't tell
+          you: where you are in the set. It's static on purpose — counting it up
+          would animate data a reader is trying to read. */}
+      <div className="mb-1.5 flex items-baseline gap-3">
+        <p className="text-[11px] leading-none font-semibold tracking-[0.07em] text-ink-3 uppercase">
+          {system.domain}
+        </p>
+        <span aria-hidden className="h-px flex-1 bg-rule" />
+        <span className="tnum shrink-0 text-[11px] leading-none text-ink-3">
+          {String(i + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+        </span>
+      </div>
 
       <h3 className="text-[15px] leading-[1.35] font-semibold tracking-[-0.012em] text-ink">
         {system.title}
