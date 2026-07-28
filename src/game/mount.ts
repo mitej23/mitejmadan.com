@@ -14,8 +14,9 @@
 import {
   BUILDINGS, BUSHES, BUSH_SRC, FENCE_H, FENCE_V, FLOWERS, FLOWER_SRC,
   GRASS_EDGE_TILE, GRASS_TILE, MAP_H, MAP_W, PATH, PATH_TILE, SPAWN,
-  TALL_GRASS, buildCollision,
+  TALL_GRASS, buildCollision, type Building,
 } from "./map";
+import { DOORWAY, INT_COLS, ROOMS, RUG_SRC, SHELF_SRC, roomCollision, tileAt } from "./interiors";
 
 const TILE = 16; // source tile size, px
 const SHEET_COLS = 12; // grass.png is 192px / 16 = 12 tiles wide
@@ -53,6 +54,9 @@ type Dir = "up" | "down" | "left" | "right";
 
 export type GameHandle = { destroy: () => void };
 
+/** Interiors are small, so they get a tighter camera than the overworld. */
+const TILES_WIDE_INSIDE = 15;
+
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -62,8 +66,11 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-export async function mountGame(host: HTMLElement): Promise<GameHandle> {
-  const [grass, trainer, buildings, path, fences, bush, flowers] = await Promise.all([
+export async function mountGame(
+  host: HTMLElement,
+  opts: { onLeave?: () => void; onEnter?: (name: string) => void } = {},
+): Promise<GameHandle> {
+  const [grass, trainer, buildings, path, fences, bush, flowers, interior] = await Promise.all([
     loadImage("/game/grass.png"),
     loadImage("/game/trainer.png"),
     loadImage("/game/buildings.png"),
@@ -71,6 +78,7 @@ export async function mountGame(host: HTMLElement): Promise<GameHandle> {
     loadImage("/game/fences.png"),
     loadImage("/game/bush.png"),
     loadImage("/game/flowers.png"),
+    loadImage("/game/interior.png"),
   ]);
 
   const canvas = document.createElement("canvas");
@@ -82,8 +90,17 @@ export async function mountGame(host: HTMLElement): Promise<GameHandle> {
 
   const ctx = canvas.getContext("2d", { alpha: false })!;
 
-  const { solid: solidMap } = buildCollision();
-  const map = { w: MAP_W, h: MAP_H, solid: solidMap };
+  const { solid: outsideSolid, doors } = buildCollision();
+
+  /**
+   * Two scenes share one loop. `inside` being null means we're in the town; the
+   * player's town position is stashed on entry so leaving a room puts them back
+   * on the doorstep rather than at spawn.
+   */
+  let inside: Building["id"] | null = null;
+  let outsideReturn = { x: SPAWN.x, y: SPAWN.y };
+
+  let map = { w: MAP_W, h: MAP_H, solid: outsideSolid };
   let scale = 3;
 
   function resize() {
@@ -91,7 +108,8 @@ export async function mountGame(host: HTMLElement): Promise<GameHandle> {
     const cssW = host.clientWidth;
     const cssH = host.clientHeight;
     // Integer scale only — a fractional scale is what makes pixel art mushy.
-    scale = Math.max(2, Math.floor(cssW / (TARGET_TILES_WIDE * TILE)));
+    const wide = inside ? TILES_WIDE_INSIDE : TARGET_TILES_WIDE;
+    scale = Math.max(2, Math.floor(cssW / (wide * TILE)));
     canvas.width = Math.floor(cssW * dpr);
     canvas.height = Math.floor(cssH * dpr);
     canvas.style.width = `${cssW}px`;
@@ -134,6 +152,11 @@ export async function mountGame(host: HTMLElement): Promise<GameHandle> {
   };
 
   function onKeyDown(e: KeyboardEvent) {
+    if (e.key === " " || e.key === "Enter" || e.key === "e" || e.key === "E") {
+      e.preventDefault();
+      interact();
+      return;
+    }
     const d = KEYS[e.key];
     if (!d) return;
     // Arrows scroll the page behind us otherwise.
@@ -152,6 +175,45 @@ export async function mountGame(host: HTMLElement): Promise<GameHandle> {
   addEventListener("keydown", onKeyDown, { passive: false });
   addEventListener("keyup", onKeyUp);
   addEventListener("blur", onBlur);
+
+  function enterRoom(id: Building["id"]) {
+    const room = ROOMS[id];
+    outsideReturn = { x: tx, y: ty };
+    inside = id;
+    map = { w: room.w, h: room.h, solid: roomCollision(room) };
+    tx = room.exit[0];
+    ty = room.exit[1] - 1;
+    fromX = tx;
+    fromY = ty;
+    step = 0;
+    dir = "up";
+    resize();
+    opts.onEnter?.(room.name);
+  }
+
+  function leaveRoom() {
+    inside = null;
+    map = { w: MAP_W, h: MAP_H, solid: outsideSolid };
+    tx = outsideReturn.x;
+    ty = outsideReturn.y;
+    fromX = tx;
+    fromY = ty;
+    step = 0;
+    dir = "down";
+    resize();
+    opts.onEnter?.("");
+  }
+
+  /** A / Space / Enter: act on whatever the player is standing on or facing. */
+  function interact() {
+    if (inside) {
+      const room = ROOMS[inside];
+      if (tx === room.exit[0] && ty === room.exit[1]) leaveRoom();
+      return;
+    }
+    const here = doors.get(ty * MAP_W + tx);
+    if (here) enterRoom(here);
+  }
 
   const DELTA: Record<Dir, [number, number]> = {
     up: [0, -1],
@@ -173,6 +235,19 @@ export async function mountGame(host: HTMLElement): Promise<GameHandle> {
         fromX = tx;
         fromY = ty;
         walkPhase = (walkPhase + 2) % 4;
+
+        // Doorways act on arrival, the way they do in the real games — you walk
+        // in rather than stopping to press a key.
+        if (inside) {
+          const room = ROOMS[inside];
+          if (tx === room.exit[0] && ty === room.exit[1]) leaveRoom();
+        } else {
+          const d = doors.get(ty * MAP_W + tx);
+          if (d) enterRoom(d);
+          // Walking south out of the gate returns to the résumé. The gap in the
+          // fence is the only way out, so it reads as the exit rather than a bug.
+          else if (ty >= MAP_H - 1 && tx === SPAWN.x) opts.onLeave?.();
+        }
       }
       return;
     }
@@ -216,8 +291,12 @@ export async function mountGame(host: HTMLElement): Promise<GameHandle> {
     // Camera centres the player, then clamps so we never show past the edges.
     let camX = px + TILE / 2 - viewW / 2;
     let camY = py + TILE / 2 - viewH / 2;
-    camX = Math.max(0, Math.min(camX, map.w * TILE - viewW));
-    camY = Math.max(0, Math.min(camY, map.h * TILE - viewH));
+    // A room can be smaller than the viewport, in which case clamping to bounds
+    // would shove it into the corner — centre it instead.
+    const worldW = map.w * TILE;
+    const worldH = map.h * TILE;
+    camX = worldW <= viewW ? (worldW - viewW) / 2 : Math.max(0, Math.min(camX, worldW - viewW));
+    camY = worldH <= viewH ? (worldH - viewH) / 2 : Math.max(0, Math.min(camY, worldH - viewH));
     // Snap the camera to whole device pixels or the tile seams shimmer.
     camX = Math.round(camX * scale) / scale;
     camY = Math.round(camY * scale) / scale;
@@ -228,12 +307,6 @@ export async function mountGame(host: HTMLElement): Promise<GameHandle> {
     ctx.save();
     ctx.scale(scale, scale);
     ctx.translate(-camX, -camY);
-
-    // ── ground ────────────────────────────────────────────────────────────
-    const x0 = Math.max(0, Math.floor(camX / TILE));
-    const y0 = Math.max(0, Math.floor(camY / TILE));
-    const x1 = Math.min(map.w, Math.ceil((camX + viewW) / TILE));
-    const y1 = Math.min(map.h, Math.ceil((camY + viewH) / TILE));
 
     const blit = (
       img: HTMLImageElement,
@@ -255,6 +328,44 @@ export async function mountGame(host: HTMLElement): Promise<GameHandle> {
       );
     };
 
+    const x0 = Math.max(0, Math.floor(camX / TILE));
+    const y0 = Math.max(0, Math.floor(camY / TILE));
+    const x1 = Math.min(map.w, Math.ceil((camX + viewW) / TILE));
+    const y1 = Math.min(map.h, Math.ceil((camY + viewH) / TILE));
+
+    type Drawable = { baseY: number; paint: () => void };
+    const layer: Drawable[] = [];
+
+    if (inside) {
+      // ── interior ────────────────────────────────────────────────────────
+      const room = ROOMS[inside];
+      for (let y = y0; y < y1; y++) {
+        for (let x = x0; x < x1; x++) {
+          blit(interior, tileAt(room, x, y), INT_COLS, x * TILE, y * TILE);
+        }
+      }
+
+      if (room.rug) {
+        const [rx, ry] = room.rug;
+        const [sx, sy, sw, sh] = RUG_SRC;
+        ctx.drawImage(interior, sx, sy, sw, sh, rx * TILE, ry * TILE, sw, sh);
+      }
+
+      // The doorway is drawn over the wall so it reads as an opening, and over
+      // the floor at the exit so the way out is obvious without a label.
+      const [ex, ey] = room.exit;
+      blit(interior, DOORWAY, INT_COLS, ex * TILE, ey * TILE);
+
+      for (const [sx2, sy2] of room.shelves) {
+        const [sx, sy, sw, sh] = SHELF_SRC;
+        layer.push({
+          baseY: (sy2 + 1) * TILE,
+          paint: () =>
+            ctx.drawImage(interior, sx, sy, sw, sh, sx2 * TILE, (sy2 + 1) * TILE - sh, sw, sh),
+        });
+      }
+    } else {
+      // ── town ────────────────────────────────────────────────────────────
     for (let y = y0; y < y1; y++) {
       for (let x = x0; x < x1; x++) {
         const edge = x === 0 || y === 0 || x === map.w - 1 || y === map.h - 1;
@@ -285,9 +396,6 @@ export async function mountGame(host: HTMLElement): Promise<GameHandle> {
     // Everything with height goes into one list ordered by the Y its base sits
     // on, so you walk behind a building's roof and in front of its doorstep.
     // Without this the illusion collapses the first time you round a corner.
-    type Drawable = { baseY: number; paint: () => void };
-    const layer: Drawable[] = [];
-
     for (const b of BUILDINGS) {
       const [sx, sy, sw, sh] = b.src;
       const bottom = (b.ty + b.th) * TILE;
@@ -309,6 +417,8 @@ export async function mountGame(host: HTMLElement): Promise<GameHandle> {
             sw, sh,
           ),
       });
+    }
+
     }
 
     // The player. Content occupies rows 10-25 of the 32px frame — measured, not

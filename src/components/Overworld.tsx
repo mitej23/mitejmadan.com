@@ -36,10 +36,17 @@ export function Overworld() {
   const [pixelStep, setPixelStep] = useState(0);
   const [loadFailed, setLoadFailed] = useState(false);
   const [slow, setSlow] = useState(false);
+  /** Name of the room you are standing in, or "" for the town. */
+  const [place, setPlace] = useState("");
 
   const hostRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<GameHandle | null>(null);
-  const modRef = useRef<{ mountGame: (el: HTMLElement) => Promise<GameHandle> } | null>(null);
+  const modRef = useRef<{
+    mountGame: (
+      el: HTMLElement,
+      opts: { onLeave?: () => void; onEnter?: (name: string) => void },
+    ) => Promise<GameHandle>;
+  } | null>(null);
   const timers = useRef<number[]>([]);
   /** Where the reader was, so leaving puts them back rather than at the top. */
   const scrollY = useRef(0);
@@ -60,6 +67,7 @@ export function Overworld() {
     setPhase("idle");
     setPixelStep(0);
     setSlow(false);
+    setPlace("");
     document.documentElement.classList.remove("ow-lock");
     // Restore the reading position and the focus ring we took.
     requestAnimationFrame(() => {
@@ -140,7 +148,12 @@ export function Overworld() {
     document.documentElement.classList.add("ow-lock");
 
     mod
-      .mountGame(host)
+      .mountGame(host, {
+        // Walking south out of the town gate leaves, which is the second exit
+        // the design needs: one you find by playing, not by reading the UI.
+        onLeave: () => exit(),
+        onEnter: (name: string) => setPlace(name),
+      })
       .then((handle) => {
         if (cancelled) {
           handle.destroy();
@@ -209,27 +222,59 @@ export function Overworld() {
             aria-label="Overworld mode. Arrow keys or W A S D to walk. Escape to leave."
             className="size-full outline-none"
           />
-          <p className="pointer-events-none absolute inset-x-0 bottom-4 text-center text-[12px] text-white/55">
-            Arrows / WASD to walk · <kbd className="font-sans">Esc</kbd> to go back
-          </p>
+          {place && (
+            <p className="pointer-events-none absolute inset-x-0 top-5 text-center text-[13px] font-semibold tracking-[0.06em] text-white/85 uppercase drop-shadow">
+              {place}
+            </p>
+          )}
+
+          <div className="absolute inset-x-0 bottom-4 flex flex-col items-center gap-2">
+            <button
+              type="button"
+              onClick={exit}
+              className="group inline-flex items-center gap-1.5 rounded-full bg-white/12 px-4 py-2 text-[12.5px] font-medium text-white/90 backdrop-blur transition-colors hover:bg-white/22 hover:text-white"
+            >
+              <svg
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}
+                strokeLinecap="round" strokeLinejoin="round" aria-hidden
+                className="size-3.5 transition-transform duration-200 group-hover:-translate-x-0.5"
+              >
+                <path d="M20 12H5M11 18l-6-6 6-6" />
+              </svg>
+              Back to résumé
+            </button>
+            <p className="pointer-events-none text-center text-[11.5px] text-white/45">
+              Arrows / WASD to walk · <kbd className="font-sans">Space</kbd> at a door ·
+              walk out the south gate to leave
+            </p>
+            <p className="text-center text-[10.5px] text-white/25">
+              Tiles by{" "}
+              <a
+                href="https://axulart.itch.io/axularts-basic-top-down-interior"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="pointer-events-auto underline decoration-white/25 hover:text-white/50"
+              >
+                AxulArt
+              </a>{" "}
+              (CC BY 4.0) · Pocket Creature Tamer
+            </p>
+          </div>
+          {/* The labelled control lives at the bottom centre; this is just a
+              close affordance in the corner, so the two don't read as duplicates. */}
           <button
             type="button"
             onClick={exit}
-            className="group absolute top-4 right-4 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-2 text-[12.5px] font-medium text-white/85 backdrop-blur transition-colors hover:bg-white/20 hover:text-white"
+            aria-label="Back to résumé"
+            title="Back to résumé (Esc)"
+            className="absolute top-4 right-4 grid size-9 place-items-center rounded-full bg-white/10 text-white/70 backdrop-blur transition-colors hover:bg-white/20 hover:text-white"
           >
             <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={1.8}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-              className="size-3.5 transition-transform duration-200 group-hover:-translate-x-0.5"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
+              strokeLinecap="round" strokeLinejoin="round" aria-hidden className="size-4"
             >
-              <path d="M20 12H5M11 18l-6-6 6-6" />
+              <path d="M18 6 6 18M6 6l12 12" />
             </svg>
-            Back to résumé
           </button>
         </div>
       )}
