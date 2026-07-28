@@ -441,6 +441,40 @@
    * numbers. At 15px with this leading they resolve, so the whole panel can stay
    * in the game's own type.
    */
+  /* Pixel sprites must not be smoothed when scaled up. */
+  .ow-px {
+    image-rendering: pixelated;
+  }
+
+  /**
+   * Book palette, sampled from the sprites themselves (#ffd7a8 parchment) so the
+   * text sits in the same world as the frame rather than on top of it. Fixed
+   * values, not theme tokens: the book looks the same in light and dark mode.
+   */
+  .ow-book {
+    --bk-paper: #ffd7a8;
+    --bk-paper-2: #f7c78e;
+    --bk-ink: #3a2415;
+    --bk-ink-2: #55361f;
+    --bk-ink-3: #7a5433;
+    --bk-rule: #b98a5a;
+    --bk-edge: #4a2a17;
+  }
+
+  /* Each page turn replays this, so the spread reads as a new sheet. */
+  @media (prefers-reduced-motion: no-preference) {
+    .ow-page {
+      animation: bk-turn 260ms var(--ease-out-quart);
+    }
+  }
+
+  @keyframes bk-turn {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 4px, 0);
+    }
+  }
+
   .ow-prose {
     font-family: "VT323", ui-monospace, monospace;
     font-size: 17px;

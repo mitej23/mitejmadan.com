@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { GameHandle } from "../game/mount";
-import { Dialogue, pagesFor, type Page } from "./OverworldDialogue";
+import { Book, spreadsFor, type Spread } from "./OverworldBook";
 
 /**
  * The pipe, the transition, and the host the overworld mounts into.
@@ -40,7 +40,7 @@ export function Overworld() {
   /** Name of the room you are standing in, or "" for the town. */
   const [place, setPlace] = useState("");
   /** Non-null while a text box is open; the engine is paused for its lifetime. */
-  const [pages, setPages] = useState<Page[] | null>(null);
+  const [pages, setPages] = useState<Spread[] | null>(null);
   /** Set when something readable is in front of the player. */
   const [near, setNear] = useState<string | null>(null);
 
@@ -165,7 +165,7 @@ export function Overworld() {
         // the design needs: one you find by playing, not by reading the UI.
         onLeave: () => exit(),
         onEnter: (name: string) => setPlace(name),
-        onRead: (topic: string) => setPages(pagesFor(topic)),
+        onRead: (topic: string) => setPages(spreadsFor(topic)),
         onNear: (topic: string | null) => setNear(topic),
       })
       .then((handle) => {
@@ -242,17 +242,15 @@ export function Overworld() {
             ref={hostRef}
             tabIndex={-1}
             aria-label="Overworld mode. Arrow keys or W A S D to walk. Escape to leave."
-            className={`h-full outline-none transition-[width] duration-300 ease-[var(--ease-out-quart)] motion-reduce:transition-none ${
-              pages ? "w-full sm:w-[calc(100%-25rem)]" : "w-full"
-            }`}
+            className="size-full outline-none"
           />
-          {place && (
-            <p className={`ow-ui pointer-events-none absolute top-5 text-center text-[13px] tracking-[0.12em] text-white/85 uppercase drop-shadow transition-[right] ${pages ? "left-0 right-0 sm:right-[25rem]" : "inset-x-0"}`}>
+          {place && !pages && (
+            <p className="ow-ui pointer-events-none absolute inset-x-0 top-5 text-center text-[13px] tracking-[0.12em] text-white/85 uppercase drop-shadow">
               {place}
             </p>
           )}
 
-          {pages && <Dialogue pages={pages} onClose={() => setPages(null)} />}
+          {pages && <Book spreads={pages} onClose={() => setPages(null)} />}
 
           {near && !pages && (
             <p className="ow-ui pointer-events-none absolute inset-x-0 bottom-24 text-center text-[12px] tracking-[0.06em] text-white/80 uppercase">
@@ -262,7 +260,9 @@ export function Overworld() {
 
           {/* No button down here any more: it sat directly over the south gate,
               which is the way out. Walk through the gate, or use Esc / the × . */}
-          <div className={`ow-ui pointer-events-none absolute bottom-3 flex flex-col items-center gap-1.5 transition-[right] ${pages ? "left-0 right-0 sm:right-[25rem]" : "inset-x-0"}`}>
+          <div
+            className={`ow-ui pointer-events-none absolute inset-x-0 bottom-3 flex flex-col items-center gap-1.5 transition-opacity duration-200 ${pages ? "opacity-0" : "opacity-100"}`}
+          >
             <p className="text-center text-[11px] tracking-[0.05em] text-white/40 uppercase">
               Arrows to walk · Space to read · south gate to leave
             </p>
@@ -276,7 +276,7 @@ export function Overworld() {
               >
                 AxulArt
               </a>{" "}
-              (CC BY 4.0) · Pocket Creature Tamer
+              (CC BY 4.0) · Pocket Creature Tamer · Book UI by Crusenho
             </p>
           </div>
           {/* Labelled, and in the opposite corner from the panel's own ×. A bare
