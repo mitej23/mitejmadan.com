@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { GameHandle } from "../game/mount";
+import { Dialogue, pagesFor, type Page } from "./OverworldDialogue";
 
 /**
  * The pipe, the transition, and the host the overworld mounts into.
@@ -38,13 +39,22 @@ export function Overworld() {
   const [slow, setSlow] = useState(false);
   /** Name of the room you are standing in, or "" for the town. */
   const [place, setPlace] = useState("");
+  /** Non-null while a text box is open; the engine is paused for its lifetime. */
+  const [pages, setPages] = useState<Page[] | null>(null);
+  /** Set when something readable is in front of the player. */
+  const [near, setNear] = useState<string | null>(null);
 
   const hostRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<GameHandle | null>(null);
   const modRef = useRef<{
     mountGame: (
       el: HTMLElement,
-      opts: { onLeave?: () => void; onEnter?: (name: string) => void },
+      opts: {
+        onLeave?: () => void;
+        onEnter?: (name: string) => void;
+        onRead?: (topic: string) => void;
+        onNear?: (topic: string | null) => void;
+      },
     ) => Promise<GameHandle>;
   } | null>(null);
   const timers = useRef<number[]>([]);
@@ -68,6 +78,8 @@ export function Overworld() {
     setPixelStep(0);
     setSlow(false);
     setPlace("");
+    setPages(null);
+    setNear(null);
     document.documentElement.classList.remove("ow-lock");
     // Restore the reading position and the focus ring we took.
     requestAnimationFrame(() => {
@@ -153,6 +165,8 @@ export function Overworld() {
         // the design needs: one you find by playing, not by reading the UI.
         onLeave: () => exit(),
         onEnter: (name: string) => setPlace(name),
+        onRead: (topic: string) => setPages(pagesFor(topic)),
+        onNear: (topic: string | null) => setNear(topic),
       })
       .then((handle) => {
         if (cancelled) {
@@ -174,18 +188,26 @@ export function Overworld() {
     };
   }, [phase, exit]);
 
+  useEffect(() => {
+    gameRef.current?.setPaused(pages !== null);
+  }, [pages]);
+
   // Escape always leaves. The game must never be something you get stuck in.
   useEffect(() => {
     if (phase === "idle") return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        exit();
+      if (e.key !== "Escape") return;
+      e.preventDefault();
+      // A dialogue is the innermost layer, so it consumes Escape first.
+      if (pages) {
+        setPages(null);
+        return;
       }
+      exit();
     };
     addEventListener("keydown", onKey);
     return () => removeEventListener("keydown", onKey);
-  }, [phase, exit]);
+  }, [phase, exit, pages]);
 
   useEffect(() => () => {
     clearTimers();
@@ -228,23 +250,19 @@ export function Overworld() {
             </p>
           )}
 
-          <div className="absolute inset-x-0 bottom-4 flex flex-col items-center gap-2">
-            <button
-              type="button"
-              onClick={exit}
-              className="group inline-flex items-center gap-1.5 rounded-full bg-white/12 px-4 py-2 text-[12.5px] font-medium text-white/90 backdrop-blur transition-colors hover:bg-white/22 hover:text-white"
-            >
-              <svg
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}
-                strokeLinecap="round" strokeLinejoin="round" aria-hidden
-                className="size-3.5 transition-transform duration-200 group-hover:-translate-x-0.5"
-              >
-                <path d="M20 12H5M11 18l-6-6 6-6" />
-              </svg>
-              Back to résumé
-            </button>
-            <p className="pointer-events-none text-center text-[11.5px] text-white/45">
-              Arrows / WASD to walk · <kbd className="font-sans">Space</kbd> at a door ·
+          {pages && <Dialogue pages={pages} onClose={() => setPages(null)} />}
+
+          {near && !pages && (
+            <p className="pointer-events-none absolute inset-x-0 bottom-20 text-center text-[12.5px] font-medium text-white/80">
+              Press <kbd className="font-sans">Space</kbd> to read
+            </p>
+          )}
+
+          {/* No button down here any more: it sat directly over the south gate,
+              which is the way out. Walk through the gate, or use Esc / the × . */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-3 flex flex-col items-center gap-1">
+            <p className="text-center text-[11.5px] text-white/40">
+              Arrows / WASD to walk · <kbd className="font-sans">Space</kbd> to read ·
               walk out the south gate to leave
             </p>
             <p className="text-center text-[10.5px] text-white/25">

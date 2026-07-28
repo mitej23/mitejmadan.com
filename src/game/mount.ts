@@ -16,7 +16,10 @@ import {
   GRASS_EDGE_TILE, GRASS_TILE, MAP_H, MAP_W, PATH, PATH_TILE, SPAWN,
   TALL_GRASS, buildCollision, type Building,
 } from "./map";
-import { DOORWAY, INT_COLS, ROOMS, RUG_SRC, SHELF_SRC, roomCollision, tileAt } from "./interiors";
+import {
+  DOORWAY, INT_COLS, ROOMS, RUG_SRC, SHELF_SRC,
+  readableAt as readableInRoom, roomCollision, tileAt,
+} from "./interiors";
 
 const TILE = 16; // source tile size, px
 const SHEET_COLS = 12; // grass.png is 192px / 16 = 12 tiles wide
@@ -52,10 +55,14 @@ const SIDE_FACES_LEFT = false;
 
 type Dir = "up" | "down" | "left" | "right";
 
-export type GameHandle = { destroy: () => void };
+export type GameHandle = {
+  destroy: () => void;
+  /** Freeze input while a dialogue is open, so arrows don't walk behind it. */
+  setPaused: (paused: boolean) => void;
+};
 
 /** Interiors are small, so they get a tighter camera than the overworld. */
-const TILES_WIDE_INSIDE = 15;
+const TILES_WIDE_INSIDE = 22;
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -68,7 +75,12 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 
 export async function mountGame(
   host: HTMLElement,
-  opts: { onLeave?: () => void; onEnter?: (name: string) => void } = {},
+  opts: {
+    onLeave?: () => void;
+    onEnter?: (name: string) => void;
+    onRead?: (topic: string) => void;
+    onNear?: (topic: string | null) => void;
+  } = {},
 ): Promise<GameHandle> {
   const [grass, trainer, buildings, path, fences, bush, flowers, interior] = await Promise.all([
     loadImage("/game/grass.png"),
@@ -152,6 +164,8 @@ export async function mountGame(
   };
 
   function onKeyDown(e: KeyboardEvent) {
+    // While a dialogue is open the UI owns the keyboard.
+    if (paused) return;
     if (e.key === " " || e.key === "Enter" || e.key === "e" || e.key === "E") {
       e.preventDefault();
       interact();
@@ -201,18 +215,48 @@ export async function mountGame(
     step = 0;
     dir = "down";
     resize();
+    lastNear = null;
+    opts.onNear?.(null);
     opts.onEnter?.("");
+  }
+
+  /** The tile directly in front of the player — what "facing" means for reading. */
+  function facingTile(): [number, number] {
+    const [dx, dy] = DELTA[dir];
+    return [tx + dx, ty + dy];
+  }
+
+  function readableAt(x: number, y: number): string | null {
+    if (!inside) return null;
+    return readableInRoom(ROOMS[inside], x, y);
   }
 
   /** A / Space / Enter: act on whatever the player is standing on or facing. */
   function interact() {
     if (inside) {
       const room = ROOMS[inside];
-      if (tx === room.exit[0] && ty === room.exit[1]) leaveRoom();
+      if (tx === room.exit[0] && ty === room.exit[1]) {
+        leaveRoom();
+        return;
+      }
+      const [fx, fy] = facingTile();
+      const topic = readableAt(fx, fy);
+      if (topic) opts.onRead?.(topic);
       return;
     }
     const here = doors.get(ty * MAP_W + tx);
     if (here) enterRoom(here);
+  }
+
+  /** Tell the UI when something readable is in front of us, so it can prompt. */
+  let lastNear: string | null = null;
+  function reportNear() {
+    const [fx, fy] = facingTile();
+    const topic = readableAt(fx, fy);
+    if (topic !== lastNear) {
+      lastNear = topic;
+      opts.onNear?.(topic);
+    }
   }
 
   const DELTA: Record<Dir, [number, number]> = {
@@ -227,7 +271,10 @@ export async function mountGame(
     return map.solid[y * map.w + x] === 1;
   }
 
+  let paused = false;
+
   function update() {
+    if (paused) return;
     if (step > 0) {
       step++;
       if (step > STEP_FRAMES) {
@@ -235,6 +282,7 @@ export async function mountGame(
         fromX = tx;
         fromY = ty;
         walkPhase = (walkPhase + 2) % 4;
+        reportNear();
 
         // Doorways act on arrival, the way they do in the real games — you walk
         // in rather than stopping to press a key.
@@ -260,6 +308,7 @@ export async function mountGame(
     }
 
     dir = next;
+    reportNear();
     const [dx, dy] = DELTA[next];
     const nx = tx + dx;
     const ny = ty + dy;
@@ -356,12 +405,15 @@ export async function mountGame(
       const [ex, ey] = room.exit;
       blit(interior, DOORWAY, INT_COLS, ex * TILE, ey * TILE);
 
-      for (const [sx2, sy2] of room.shelves) {
+      for (const shelf of room.shelves) {
         const [sx, sy, sw, sh] = SHELF_SRC;
         layer.push({
-          baseY: (sy2 + 1) * TILE,
+          baseY: (shelf.y + 1) * TILE,
           paint: () =>
-            ctx.drawImage(interior, sx, sy, sw, sh, sx2 * TILE, (sy2 + 1) * TILE - sh, sw, sh),
+            ctx.drawImage(
+              interior, sx, sy, sw, sh,
+              shelf.x * TILE, (shelf.y + 1) * TILE - sh, sw, sh,
+            ),
         });
       }
     } else {
@@ -489,6 +541,10 @@ export async function mountGame(
   raf = requestAnimationFrame(loop);
 
   return {
+    setPaused(p: boolean) {
+      paused = p;
+      if (p) held.clear();
+    },
     destroy() {
       running = false;
       cancelAnimationFrame(raf);

@@ -31,6 +31,23 @@ const WINDOW = 88;
 export const RUG_SRC: [number, number, number, number] = [144, 112, 48, 48];
 /** Both bookshelf halves as one 2×5 unit. */
 export const SHELF_SRC: [number, number, number, number] = [0, 8, 32, 80];
+export const SHELF_W = 2;
+export const SHELF_H = 5;
+
+/** The topic for whatever occupies this tile, or null. */
+export function readableAt(room: Room, x: number, y: number): string | null {
+  for (const sh of room.shelves) {
+    if (
+      x >= sh.x &&
+      x < sh.x + SHELF_W &&
+      y <= sh.y &&
+      y > sh.y - SHELF_H
+    ) {
+      return sh.topic;
+    }
+  }
+  return null;
+}
 
 export type Room = {
   id: Building["id"];
@@ -42,8 +59,13 @@ export type Room = {
   wall: number;
   /** Columns along the back wall that get a window instead of blank wall. */
   windows: number[];
-  /** Bookshelf positions, as the tile the shelf's base stands on. */
-  shelves: [number, number][];
+  /**
+   * Bookshelves. `x,y` is the tile the shelf's base stands on; each carries a
+   * topic the UI resolves against content.ts. Every tile the shelf occupies is
+   * readable, so facing it from any side works — marking only the base row meant
+   * standing beside a five-tile-tall shelf and facing it did nothing.
+   */
+  shelves: { x: number; y: number; topic: string }[];
   /** Top-left tile of the rug, or null. */
   rug: [number, number] | null;
   /** The tile you step onto to leave. Always on the bottom row. */
@@ -68,8 +90,8 @@ export const ROOMS: Record<Building["id"], Room> = {
     // Base row, not top row. The sprite is 5 tiles tall, so anything above y=6
     // pokes out through the wall into the void behind the room.
     shelves: [
-      [1, 6],
-      [10, 6],
+      { x: 1, y: 6, topic: "theagentic:role" },
+      { x: 10, y: 6, topic: "theagentic:systems" },
     ],
     rug: [5, 4],
     exit: [6, 8],
@@ -82,7 +104,7 @@ export const ROOMS: Record<Building["id"], Room> = {
     floor: FLOOR_PLANKS,
     wall: WALL_WOOD,
     windows: [7],
-    shelves: [[1, 6]],
+    shelves: [{ x: 1, y: 6, topic: "idigitize:role" }],
     rug: null,
     exit: [5, 7],
   },
@@ -95,8 +117,8 @@ export const ROOMS: Record<Building["id"], Room> = {
     wall: WALL_TAN,
     windows: [3, 7],
     shelves: [
-      [1, 6],
-      [8, 6],
+      { x: 1, y: 6, topic: "education:degrees" },
+      { x: 8, y: 6, topic: "education:stack" },
     ],
     rug: null,
     exit: [5, 7],
@@ -127,11 +149,11 @@ export function roomCollision(room: Room) {
   for (let x = 0; x < room.w; x++) {
     if (x !== room.exit[0]) solid[at(x, room.h - 1)] = 1;
   }
-  for (const [sx, sy] of room.shelves) {
-    for (let dy = -4; dy <= 0; dy++) {
-      for (let dx = 0; dx <= 1; dx++) {
-        const x = sx + dx;
-        const y = sy + dy;
+  for (const sh of room.shelves) {
+    for (let dy = -SHELF_H + 1; dy <= 0; dy++) {
+      for (let dx = 0; dx < SHELF_W; dx++) {
+        const x = sh.x + dx;
+        const y = sh.y + dy;
         if (x >= 0 && y >= 0 && x < room.w && y < room.h) solid[at(x, y)] = 1;
       }
     }

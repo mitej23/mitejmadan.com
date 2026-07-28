@@ -351,6 +351,17 @@
     overflow: hidden;
   }
 
+  /* The "there is more text" marker. */
+  .dlg-caret {
+    animation: dlg-blink 900ms steps(1, end) infinite;
+  }
+
+  @keyframes dlg-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
   /* Link underline that grows from the left on hover — cheap, transform-only,
      and it reads as a deliberate affordance rather than a default underline. */
   .link {
