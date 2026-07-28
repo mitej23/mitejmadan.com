@@ -325,6 +325,32 @@
     }
   }
 
+  /* Overworld transition. One transform per cell with a staggered delay, so the
+     scene change costs no per-frame JS. */
+  .ow-cell {
+    transform: scale(0);
+    animation: ow-in 260ms var(--ease-out-quart) forwards;
+  }
+
+  @keyframes ow-in {
+    to {
+      transform: scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ow-cell {
+      animation: none;
+      transform: scale(1);
+    }
+  }
+
+  /* While the overworld is open the page behind must not scroll. */
+  .ow-lock,
+  .ow-lock body {
+    overflow: hidden;
+  }
+
   /* Link underline that grows from the left on hover — cheap, transform-only,
      and it reads as a deliberate affordance rather than a default underline. */
   .link {

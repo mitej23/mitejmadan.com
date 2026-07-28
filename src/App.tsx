@@ -4,6 +4,7 @@ import { profile } from "./content";
 import { Nav } from "./components/Nav";
 import { Footer } from "./components/Footer";
 import { HeroWash } from "./components/HeroWash";
+import { Overworld } from "./components/Overworld";
 import { Home } from "./pages/Home";
 import { Projects } from "./pages/Projects";
 import { Experience } from "./pages/Experience";
@@ -32,24 +33,32 @@ export function App() {
 
   return (
     <>
-      <Nav />
-      {path === "/" && <HeroWash />}
+      {/* Everything the pixelate filter applies to lives in here. It cannot be
+          <html>: Chromium computes a filter on the root element but never paints
+          it, and filtering the root would also make it the containing block for
+          our fixed overlays. */}
+      <div id="site">
+        <Nav />
+        {path === "/" && <HeroWash />}
 
       {/* Keying on `path` remounts the tree on navigation, which replays every
           `.enter` and re-arms every `.reveal`. The route transition is therefore
           the same choreography as the first load, for no extra code. */}
-      <main
-        id="main"
-        key={path}
-        className={`mx-auto w-full px-5 pt-24 pb-20 sm:px-6 sm:pt-28 sm:pb-24 ${
+        <main
+          id="main"
+          key={path}
+          className={`mx-auto w-full px-5 pt-24 pb-20 sm:px-6 sm:pt-28 sm:pb-24 ${
           match && "wide" in match && match.wide
-            ? "max-w-[54rem]"
-            : "max-w-[var(--container-col)]"
-        }`}
-      >
-        <Page />
-        <Footer />
-      </main>
+              ? "max-w-[54rem]"
+              : "max-w-[var(--container-col)]"
+          }`}
+        >
+          <Page />
+          <Footer />
+        </main>
+      </div>
+
+      <Overworld />
     </>
   );
 }

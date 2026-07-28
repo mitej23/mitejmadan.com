@@ -162,7 +162,7 @@ architectural first, so we find out early if anything won't work.
 
 | # | Milestone | Why here |
 |---|---|---|
-| **M1** | Lazy route + pipe button + pixelate/wipe + an empty walkable grass field | Proves the architecture *and* the one genuinely risky bit (SVG filter perf) before any content work |
+| ~~**M1**~~ | ~~Lazy route + pipe button + pixelate/wipe + an empty walkable grass field~~ **DONE** | Architecture holds: engine is a 1.6 KB gz chunk, not referenced in the HTML, fetched only on use. Base site unchanged. |
 | **M2** | Real map, buildings, collision, camera | The world |
 | **M3** | Interiors + dialogue reading from `content.ts` | The content, and the parity check |
 | **M4** | Tall grass → project cards, creature sprites | The delight |
@@ -177,7 +177,12 @@ with no pixelate — still looks great, loses one beat.
 
 ---
 
-## 9. ⚠️ Licensing — needs your call before any asset is committed
+## 9. Licensing — settled
+
+Mitej purchased the pack license, so the real assets are committed. Original
+notes kept below for the record.
+
+### Original concern (resolved)
 
 Neither folder contains a licence or readme. `Pocket Creature Tamer DEMO` is
 clearly a **demo asset pack**, and demo packs commonly forbid redistribution.
@@ -198,9 +203,9 @@ Options:
 4. **Export your own character** from `pok3` regardless — that one *is* yours to
    configure, though the generator's own licence still applies to output.
 
-I'd build M1 with placeholder coloured rectangles so no licensed pixel is
-committed until this is settled. The engine doesn't care what the tiles look
-like, and the swap is one atlas file.
+~~I'd build M1 with placeholder coloured rectangles~~ — no longer needed. Note
+this covers the *Pocket Creature Tamer* pack only; `pok3` is a separate tool
+whose license was never discussed.
 
 ---
 
@@ -211,3 +216,31 @@ like, and the swap is one atlas file.
 3. **Mobile D-pad** — worth the extra work, or desktop-only?
 4. **How discoverable?** A visible labelled pipe, or hidden until you find it?
    Hidden is more fun; visible is the reason anyone sees it at all.
+
+
+---
+
+## 11. M1 notes — what actually happened
+
+**The pixelate filter cost a debugging pass.** `filter: url(#…)` on `<html>`
+reports correctly in `getComputedStyle` and never paints in Chromium. The CSS
+looked right, the filter existed, the computed value was set, and the page stayed
+sharp. Proving the filter itself worked — by applying it to a throwaway gradient
+div — was what isolated it. Everything now filters `#site`, a wrapper added in
+`App.tsx`, which also avoids making the root a containing block for the fixed
+overlays.
+
+**Two bugs found by measuring rather than looking:**
+
+- The pipe overlapped the centred nav pill at 320px and 375px — the two most
+  common phone widths. It is now hidden below `sm`, which is also honest given
+  there are no touch controls yet.
+- Grass was initially tile 51, which is a flat colour fill, so the field rendered
+  as a plain green background. The dithered textures are rows 1–3, cols 2–3;
+  it now uses 26 with 27 scattered on a hash so the variation never shimmers
+  between frames.
+
+**Measured:** engine chunk **1.6 KB gz**, assets **28 KB**, main bundle
+**88.4 KB gz** (+2.5 KB for the pipe and transition, which is the part that
+cannot be lazy). No `modulepreload` for the chunk — verified absent from the
+built HTML, so it genuinely does not load until used.
