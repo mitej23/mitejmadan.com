@@ -242,10 +242,12 @@ export function Overworld() {
             ref={hostRef}
             tabIndex={-1}
             aria-label="Overworld mode. Arrow keys or W A S D to walk. Escape to leave."
-            className="size-full outline-none"
+            className={`h-full outline-none transition-[width] duration-300 ease-[var(--ease-out-quart)] motion-reduce:transition-none ${
+              pages ? "w-full sm:w-[calc(100%-24rem)]" : "w-full"
+            }`}
           />
           {place && (
-            <p className="pointer-events-none absolute inset-x-0 top-5 text-center text-[13px] font-semibold tracking-[0.06em] text-white/85 uppercase drop-shadow">
+            <p className={`pointer-events-none absolute top-5 text-center text-[13px] font-semibold tracking-[0.06em] text-white/85 uppercase drop-shadow transition-[right] ${pages ? "left-0 right-0 sm:right-[24rem]" : "inset-x-0"}`}>
               {place}
             </p>
           )}
@@ -260,7 +262,7 @@ export function Overworld() {
 
           {/* No button down here any more: it sat directly over the south gate,
               which is the way out. Walk through the gate, or use Esc / the × . */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-3 flex flex-col items-center gap-1">
+          <div className={`pointer-events-none absolute bottom-3 flex flex-col items-center gap-1 transition-[right] ${pages ? "left-0 right-0 sm:right-[24rem]" : "inset-x-0"}`}>
             <p className="text-center text-[11.5px] text-white/40">
               Arrows / WASD to walk · <kbd className="font-sans">Space</kbd> to read ·
               walk out the south gate to leave
@@ -285,7 +287,7 @@ export function Overworld() {
             onClick={exit}
             aria-label="Back to résumé"
             title="Back to résumé (Esc)"
-            className="absolute top-4 right-4 grid size-9 place-items-center rounded-full bg-white/10 text-white/70 backdrop-blur transition-colors hover:bg-white/20 hover:text-white"
+            className={`absolute top-4 z-20 grid size-9 place-items-center rounded-full bg-white/10 text-white/70 backdrop-blur transition-[background-color,color,right] hover:bg-white/20 hover:text-white ${pages ? "right-4 sm:right-[25rem]" : "right-4"}`}
           >
             <svg
               viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
