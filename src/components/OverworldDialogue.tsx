@@ -57,10 +57,7 @@ export function pagesFor(topic: string): Page[] {
           kicker: `${i + 1} / ${systems.length} · ${s.domain}`,
           title: s.title,
           body: plain(s.body),
-          aside: [
-            { label: "What made it hard", text: plain(s.hard) },
-            ...(s.role ? [{ label: "Scope", text: plain(s.role) }] : []),
-          ],
+          aside: s.role ? [{ label: "Scope", text: plain(s.role) }] : undefined,
           tags: s.stack,
         })),
       ];
@@ -150,23 +147,23 @@ export function Dialogue({ pages, onClose }: { pages: Page[]; onClose: () => voi
       tabIndex={-1}
       className="ow-ui absolute inset-x-0 bottom-0 z-20 max-h-[62%] outline-none sm:inset-y-0 sm:right-0 sm:left-auto sm:max-h-none sm:w-[25rem]"
     >
-      <div className="flex h-full flex-col border-t-2 border-white/80 bg-[#151a28]/97 backdrop-blur sm:border-t-0 sm:border-l-2">
+      <div className="flex h-full flex-col border-t-[3px] border-[var(--ow-edge)] bg-[var(--ow-paper)] sm:border-t-0 sm:border-l-[3px]">
         {/* The panel owns its own dismiss. Previously the only × on screen exited
             the whole overworld, which read as "close this panel" and wasn't. */}
-        <div className="flex shrink-0 items-start gap-3 border-b border-white/10 px-5 py-4">
+        <div className="flex shrink-0 items-start gap-3 border-b border-[var(--ow-edge)]/20 px-5 py-4">
           <div className="min-w-0 flex-1">
             {page.kicker && (
-              <p className="mb-1.5 text-[11px] leading-none tracking-[0.14em] text-white/60 uppercase">
+              <p className="mb-1.5 text-[11px] leading-none tracking-[0.14em] text-[var(--ow-ink-3)] uppercase">
                 {page.kicker}
               </p>
             )}
-            <h2 className="text-[18px] leading-[1.4] text-white">{page.title}</h2>
+            <h2 className="text-[18px] leading-[1.4] text-[var(--ow-ink)]">{page.title}</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close panel"
-            className="-mt-1 -mr-1 grid size-7 shrink-0 place-items-center rounded text-white/65 transition-colors hover:bg-white/10 hover:text-white"
+            className="-mt-1 -mr-1 grid size-7 shrink-0 place-items-center rounded text-[var(--ow-ink-3)] transition-colors hover:bg-[var(--ow-edge)]/10 hover:text-[var(--ow-ink)]"
           >
             <svg
               viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2}
@@ -179,7 +176,7 @@ export function Dialogue({ pages, onClose }: { pages: Page[]; onClose: () => voi
 
         <div ref={scroller} className="flex-1 overflow-y-auto px-5 py-5">
           {page.body && (
-            <p className="ow-prose whitespace-pre-line text-white/85">{page.body}</p>
+            <p className="ow-prose whitespace-pre-line text-[var(--ow-ink-2)]">{page.body}</p>
           )}
 
           {page.items && (
@@ -187,7 +184,7 @@ export function Dialogue({ pages, onClose }: { pages: Page[]; onClose: () => voi
               {page.items.map((it) => (
                 <li
                   key={it}
-                  className="ow-prose relative pl-4 text-white/80 before:absolute before:top-[0.75em] before:left-0 before:size-[3px] before:bg-white/35"
+                  className="ow-prose relative pl-4 text-[var(--ow-ink-2)] before:absolute before:top-[0.75em] before:left-0 before:size-[3px] before:bg-[var(--ow-ink-3)]"
                 >
                   {it}
                 </li>
@@ -197,18 +194,18 @@ export function Dialogue({ pages, onClose }: { pages: Page[]; onClose: () => voi
 
           {/* Hairlines divide; nothing is boxed. */}
           {page.aside?.map((a) => (
-            <div key={a.label} className="mt-5 border-l border-white/15 pl-4">
-              <p className="mb-1.5 text-[11px] leading-none tracking-[0.14em] text-white/60 uppercase">
+            <div key={a.label} className="mt-5 border-l-2 border-[var(--ow-edge)]/25 pl-4">
+              <p className="mb-1.5 text-[11px] leading-none tracking-[0.14em] text-[var(--ow-ink-3)] uppercase">
                 {a.label}
               </p>
-              <p className="ow-prose whitespace-pre-line text-white/75">{a.text}</p>
+              <p className="ow-prose whitespace-pre-line text-[var(--ow-ink-2)]">{a.text}</p>
             </div>
           ))}
 
           {page.tags && (
             <ul className="mt-5 flex flex-wrap gap-1.5">
               {page.tags.map((t) => (
-                <li key={t} className="bg-white/10 px-2 py-0.5 text-[12px] text-white/75">
+                <li key={t} className="border border-[var(--ow-edge)]/20 bg-[var(--ow-edge)]/[0.06] px-2 py-0.5 text-[12px] text-[var(--ow-ink-2)]">
                   {t}
                 </li>
               ))}
@@ -218,7 +215,7 @@ export function Dialogue({ pages, onClose }: { pages: Page[]; onClose: () => voi
 
         {/* Paging is the main control now that entries are long, so it gets real
             buttons and a visible count rather than small text links. */}
-        <div className="shrink-0 border-t border-white/10 px-4 py-3">
+        <div className="shrink-0 border-t border-[var(--ow-edge)]/20 px-4 py-3">
           {many ? (
             <div className="flex items-center gap-2">
               <button
@@ -226,25 +223,25 @@ export function Dialogue({ pages, onClose }: { pages: Page[]; onClose: () => voi
                 onClick={() => setI((n) => Math.max(0, n - 1))}
                 disabled={i === 0}
                 aria-label="Previous entry"
-                className="flex size-9 items-center justify-center border border-white/20 text-[15px] text-white/75 transition-colors hover:border-white/45 hover:text-white disabled:opacity-25 disabled:hover:border-white/20"
+                className="flex size-9 items-center justify-center border-2 border-[var(--ow-edge)]/30 text-[15px] text-[var(--ow-ink-2)] transition-colors hover:border-[var(--ow-edge)]/60 hover:text-[var(--ow-ink)] disabled:opacity-30 disabled:hover:border-[var(--ow-edge)]/30"
               >
                 ←
               </button>
-              <span className="flex-1 text-center text-[12px] tracking-[0.08em] text-white/55 tabular-nums">
+              <span className="flex-1 text-center text-[12px] tracking-[0.08em] text-[var(--ow-ink-3)] tabular-nums">
                 {i + 1} / {pages.length}
               </span>
               <button
                 type="button"
                 onClick={() => (last ? onClose() : setI((n) => n + 1))}
                 aria-label={last ? "Close panel" : "Next entry"}
-                className="flex h-9 items-center gap-2 border border-[var(--ow-accent)]/50 px-3 text-[12px] tracking-[0.08em] text-[var(--ow-accent)] uppercase transition-colors hover:border-[var(--ow-accent)] hover:bg-[var(--ow-accent)]/10"
+                className="flex h-9 items-center gap-2 border-2 border-[var(--ow-accent)]/60 px-3 text-[12px] tracking-[0.08em] text-[var(--ow-accent)] uppercase transition-colors hover:border-[var(--ow-accent)] hover:bg-[var(--ow-accent)]/[0.08]"
               >
                 {last ? "Done" : "Next"}
                 <span aria-hidden>→</span>
               </button>
             </div>
           ) : (
-            <p className="py-1 text-center text-[12px] tracking-[0.08em] text-white/50 uppercase">
+            <p className="py-1 text-center text-[12px] tracking-[0.08em] text-[var(--ow-ink-3)] uppercase">
               Esc or × to close
             </p>
           )}

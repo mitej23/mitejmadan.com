@@ -148,6 +148,15 @@ export async function mountGame(
   let walkPhase = 0;
 
   const held = new Set<Dir>();
+  /**
+   * A direction seen on keydown but possibly already released.
+   *
+   * Logic runs on a fixed 60Hz step, so a quick tap can put a direction into
+   * `held` and take it out again between two ticks — the step never happens and
+   * the press is silently swallowed. Holding a key was fine; tapping was not.
+   * This buffer survives the keyup so one tap always produces one step.
+   */
+  let buffered: Dir | null = null;
   const KEYS: Record<string, Dir> = {
     ArrowUp: "up",
     ArrowDown: "down",
@@ -176,6 +185,7 @@ export async function mountGame(
     // Arrows scroll the page behind us otherwise.
     e.preventDefault();
     held.add(d);
+    buffered = d;
   }
   function onKeyUp(e: KeyboardEvent) {
     const d = KEYS[e.key];
@@ -184,6 +194,7 @@ export async function mountGame(
   // Losing focus mid-step would otherwise leave a key stuck down forever.
   function onBlur() {
     held.clear();
+    buffered = null;
   }
 
   addEventListener("keydown", onKeyDown, { passive: false });
@@ -317,8 +328,10 @@ export async function mountGame(
       return;
     }
 
-    // Last key pressed wins, which is what makes direction changes feel responsive.
-    const next = [...held].pop();
+    // Last key pressed wins, which is what makes direction changes feel
+    // responsive; a buffered tap is used only once nothing is held.
+    const next = [...held].pop() ?? buffered;
+    buffered = null;
     if (!next) {
       animTick = 0;
       return;
@@ -588,7 +601,10 @@ export async function mountGame(
   return {
     setPaused(p: boolean) {
       paused = p;
-      if (p) held.clear();
+      if (p) {
+        held.clear();
+        buffered = null;
+      }
     },
     destroy() {
       running = false;

@@ -407,11 +407,21 @@
    */
   .ow-ui {
     /**
-     * The overworld is always dark regardless of the site's theme, so it cannot
-     * use --color-accent: in light mode that token is a dark ember and lands at
-     * 3.3:1 on this panel. This is a fixed light ember instead.
+     * The reading panel is light paper with dark text, which is both easier to
+     * read and closer to the source material — Gen 3 text boxes are pale with a
+     * heavy border, not dark. Thin pixel strokes reversed out of near-black smear
+     * badly at any measured contrast ratio.
+     *
+     * These are fixed values, not theme tokens: the panel looks the same whether
+     * the site is in light or dark mode, so a token that flips would break it in
+     * one of them.
      */
-    --ow-accent: oklch(0.8 0.14 58);
+    --ow-paper: #f7f2e7;
+    --ow-ink: #2b2620;
+    --ow-ink-2: #574f45;
+    --ow-ink-3: #635a4f;
+    --ow-edge: #2c3348;
+    --ow-accent: #a8481a;
     font-family: "Pixelify Sans", ui-monospace, monospace;
     -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: unset;
