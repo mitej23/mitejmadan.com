@@ -242,6 +242,57 @@
     }
   }
 
+  /* Keyword emphasis. An ember rule that draws in from the left as the line
+     arrives, so a dense paragraph has something for the eye to catch on.
+
+     Drawn as a background gradient rather than an absolutely positioned
+     pseudo-element: a `::after` only tracks one line fragment, so any phrase
+     that wrapped lost its underline entirely. `box-decoration-break: clone`
+     gives every fragment its own rule.
+
+     Default state is drawn, not undrawn — without JS `.reveal` never gets
+     `.is-in`, and an underline that never arrives is worse than a static one. */
+  .kw {
+    font-style: normal;
+    font-weight: 500;
+    color: var(--color-ink);
+    padding-bottom: 1px;
+    background-image: linear-gradient(
+      color-mix(in oklab, var(--color-accent) 55%, transparent),
+      color-mix(in oklab, var(--color-accent) 55%, transparent)
+    );
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 1.5px;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .js .kw {
+      background-size: 0% 1.5px;
+      transition: background-size 700ms var(--ease-out-quart) 220ms;
+    }
+
+    .js .reveal.is-in .kw {
+      background-size: 100% 1.5px;
+    }
+
+    /* Above the fold there is no observer to wait on, so drive it directly. */
+    .js .enter .kw {
+      animation: kw-draw 700ms var(--ease-out-quart) 520ms both;
+    }
+  }
+
+  @keyframes kw-draw {
+    from {
+      background-size: 0% 1.5px;
+    }
+    to {
+      background-size: 100% 1.5px;
+    }
+  }
+
   /* Link underline that grows from the left on hover — cheap, transform-only,
      and it reads as a deliberate affordance rather than a default underline. */
   .link {

@@ -26,14 +26,13 @@ In priority order:
 
 | # | What | Why it matters |
 |---|------|----------------|
-| 1 | **TheAgentic start date** | Renders literally as `TODO — Present`. The one remaining placeholder that a reader will see. The role's bullets are now written from the actual codebases. |
-| 2 | **`offClock`** | Invented. The résumé had nothing personal in it. A generic hobbies line is worse than deleting the section. |
-| 3 | **Food Ordering System link** | The résumé's URL (`mitej23/restaurant-app`) 404s — renamed, deleted, or private. The entry currently renders with no link at all. |
-| 4 | **`profile.resume`** | Deliberately `null`, which hides the nav link. You called the PDF outdated, and publishing it under "Résumé" would misrepresent you. Drop a current one at `public/resume.pdf` and set the path to restore the link. |
-| 5 | **Three project blurbs** | `db-alembic-schema-viewer`, `llm-math-visualiser`, and `canvas-editor` have no repo descriptions, so those blurbs are my reading of the code. |
-| 6 | **`stack`** | Evidence-based only. I removed my earlier guesses (FastAPI, Redis, Docker, AWS) rather than assert them — add what you actually use at TheAgentic. |
-| 7 | **`links.email`** | Set to the work address. Switch if you'd rather personal mail (the résumé lists `mitejmadan@gmail.com`). |
-| 8 | **`photo.caption`** | Just says "Thailand". The cliffs look like Krabi, but I'm not guessing the beach or year on your behalf. |
+| 1 | **`offClock`** | Invented. The résumé had nothing personal in it. A generic hobbies line is worse than deleting the section. |
+| 2 | **Food Ordering System link** | The résumé's URL (`mitej23/restaurant-app`) 404s — renamed, deleted, or private. The entry currently renders with no link at all. |
+| 3 | **`profile.resume`** | Deliberately `null`, which hides the nav link. You called the PDF outdated, and publishing it under "Résumé" would misrepresent you. Drop a current one at `public/resume.pdf` and set the path to restore the link. |
+| 4 | **Three project blurbs** | `db-alembic-schema-viewer`, `llm-math-visualiser`, and `canvas-editor` have no repo descriptions, so those blurbs are my reading of the code. |
+| 5 | **`stack`** | Evidence-based only. I removed my earlier guesses (FastAPI, Redis, Docker, AWS) rather than assert them — add what you actually use at TheAgentic. |
+| 6 | **`links.email`** | Set to the work address. Switch if you'd rather personal mail (the résumé lists `mitejmadan@gmail.com`). |
+| 7 | **`photo.caption`** | Just says "Thailand". The cliffs look like Krabi, but I'm not guessing the beach or year on your behalf. |
 
 Verified from the résumé and needing no attention: the Idigitize Infotech role,
 education, and the Boardly / Campaigns / College Data Collection blurbs.
@@ -151,6 +150,37 @@ Checked against the production build in headless Chromium:
 - **320px viewport** — nav pill is 240px, clears the narrowest common viewport
   without clipping (it's centred by transform, so overflow would cut both ends).
 - No console errors or hydration warnings.
+
+## Keyword emphasis
+
+Prose in `content.ts` can mark a term with `*asterisks*`. `Rich` (src/components/Rich.tsx)
+splits on that and wraps it in `.kw`, which draws an ember rule under the term as
+the line arrives. No markdown parser ships — it's one regex split.
+
+Two things to know before using it:
+
+- **Only fields rendered through `Rich` may contain markers.** `profile.status`,
+  titles, captions, and alt text render raw, and a marker there prints literal
+  asterisks on the page. That happened once already.
+- The rule is a **background gradient with `box-decoration-break: clone`**, not a
+  `::after`. A pseudo-element only tracks one line fragment, so any phrase that
+  wrapped silently lost its underline.
+
+## The hero wash
+
+`/` has a slow WebGL mesh gradient across the top (`@paper-design/shaders-react`,
+Apache-2.0). It costs **~8KB gzipped** — the package is 410KB unpacked but one
+shader tree-shakes down hard.
+
+It is bounded by contrast, not taste. `--color-ink-3` clears WCAG AA on the page
+background by only 4.72:1, so the wash may not darken what sits behind it by
+much. At 0.3 opacity with the current tones the composited hero measures 4.68:1.
+**Darkening the palette or raising the opacity will push it under 4.5** — the
+CSS-level contrast check cannot catch this, because it reads computed colours
+rather than rendered pixels. Measure the actual composite if you change it.
+
+Mounts a frame after hydration, fades in, and freezes (`speed 0`) under
+`prefers-reduced-motion`.
 
 ## Images
 

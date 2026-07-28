@@ -1,5 +1,6 @@
 import type { System } from "../content";
 import { Reveal } from "./Reveal";
+import { Rich } from "./Rich";
 
 /**
  * One anonymised system. Deliberately roomier than a résumé bullet: the domain
@@ -17,10 +18,12 @@ export function SystemRow({ system, i }: { system: System; i: number }) {
         {system.title}
       </h3>
 
-      <p className="mt-2 text-[14px] leading-[1.65] text-ink-2">{system.body}</p>
+      <p className="mt-2 text-[14px] leading-[1.65] text-ink-2">
+        <Rich text={system.body} />
+      </p>
 
       <p className="mt-3 border-l border-accent/35 pl-3.5 text-[13.5px] leading-[1.65] text-ink-2">
-        {system.hard}
+        <Rich text={system.hard} />
       </p>
 
       {system.role && (

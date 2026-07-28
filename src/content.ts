@@ -28,8 +28,8 @@ export const profile = {
   // Two or three short paragraphs. First person, specific, no adjectives that
   // could apply to anyone.
   intro: [
-    "I build the parts of software that have to actually hold up: the services underneath, the data model in the middle, and the interface people touch. Right now that means agent infrastructure at TheAgentic.",
-    "Most of what I ship is TypeScript — React on one side, Node and Postgres on the other — with Python where it fits better. I'm drawn to the problems where the hard part isn't the feature, it's the correctness underneath: merging concurrent edits without a server picking winners, executing a scheduled flow per recipient, keeping state that survives a refresh.",
+    "I build the parts of software that have to actually hold up: the *services underneath*, the *data model in the middle*, and the *interface people touch*. Right now that means *agent infrastructure* at TheAgentic.",
+    "Most of what I ship is TypeScript — React on one side, Node and Postgres on the other — with Python where it fits better. I'm drawn to the problems where the hard part isn't the feature, it's the correctness underneath: *merging concurrent edits without a server picking winners*, executing a scheduled flow per recipient, keeping state that survives a refresh.",
   ],
   /**
    * TODO(mitej): pointing at nothing on purpose. You called the résumé outdated
@@ -59,19 +59,19 @@ export type Capability = { title: string; body: string };
 export const capabilities: Capability[] = [
   {
     title: "Agent harnesses",
-    body: "The loop around a model call — tool dispatch, exit conditions, approval gates, and a durable record of what happened. The difficulty is rarely the model; it's containment. Errors compound over a long run, so the work is bounding what one bad step can reach and leaving a trace good enough to diagnose it afterwards.",
+    body: "The loop around a model call — *tool dispatch*, *exit conditions*, *approval gates*, and a *durable record* of what happened. The difficulty is rarely the model; it's *containment*. Errors compound over a long run, so the work is bounding what one bad step can reach and leaving a trace good enough to diagnose it afterwards.",
   },
   {
     title: "Tool surfaces",
-    body: "A model given hundreds of tools picks badly, so the question is what the tool layer should be at all — how it's grouped, how much each call returns, and whether it can be generated from the schema instead of hand-maintained against one. I've consistently got more out of this than out of prompt work.",
+    body: "A model given hundreds of tools picks badly, so the question is what the tool layer should be at all — how it's grouped, how much each call returns, and whether it can be *generated from the schema* instead of hand-maintained against one. I've consistently got more out of this than out of prompt work.",
   },
   {
     title: "Interfaces for work that takes time",
-    body: "Agent runs, long jobs, and collaborative editing share a problem: the interface has to stay truthful while something slow or concurrent happens behind it, including when the user closes the tab and comes back. That means streamed state, buffered replay rather than silent gaps, and approval steps that own a real deadline.",
+    body: "Agent runs, long jobs, and collaborative editing share a problem: the interface has to stay truthful while something slow or concurrent happens behind it, including when the user closes the tab and comes back. That means *streamed state*, *buffered replay* rather than silent gaps, and approval steps that own a real deadline.",
   },
   {
     title: "Backend and data",
-    body: "Postgres-first: schema and migrations, background execution that stays correct unattended, and auth I've written from scratch often enough to know the sharp edges. On the correctness end, CRDTs for concurrent edits that have to converge without a server arbitrating who wins.",
+    body: "Postgres-first: schema and migrations, background execution that stays correct unattended, and auth I've written from scratch often enough to know the sharp edges. On the correctness end, *CRDTs* for concurrent edits that have to converge without a server arbitrating who wins.",
   },
 ];
 
@@ -96,7 +96,7 @@ export const projects: Project[] = [
     name: "Boardly",
     year: "2024",
     blurb:
-      "Collaborative canvas for brainstorming, built on CRDTs so concurrent edits converge without a server deciding who wins. Y.js handles conflict resolution; JWT handles auth and authorization.",
+      "Collaborative canvas for brainstorming, built on *CRDTs* so concurrent edits converge without a server deciding who wins. Y.js handles conflict resolution; JWT handles auth and authorization.",
     stack: ["React", "TypeScript", "Y.js", "Express", "Prisma", "React Query"],
     href: "https://github.com/mitej23/boardly",
   },
@@ -104,7 +104,7 @@ export const projects: Project[] = [
     name: "Campaigns",
     year: "2024",
     blurb:
-      "Email automation built around a drag-and-drop editor: you compose a campaign as a flow of sends, delays, and conditions, and the backend executes it per recipient — including branches that depend on what the recipient did.",
+      "Email automation built around a *drag-and-drop editor*: you compose a campaign as a flow of sends, delays, and conditions, and the backend executes it per recipient — including branches that depend on what the recipient did.",
     stack: ["React", "Express", "Postgres", "shadcn/ui"],
     href: "https://github.com/mitej23/Campaigns",
   },
@@ -180,11 +180,7 @@ export const experience: Role[] = [
   {
     company: "TheAgentic",
     title: "Full Stack Engineer",
-    // TODO(mitej): the résumé predates this role entirely, so the start date and
-    // all three bullets below are still mine, not yours. This is the last
-    // significant placeholder on the site — concrete beats impressive, so name
-    // the system and what changed because of it.
-    start: "TODO",
+    start: "Dec 2024",
     end: "Present",
     href: "https://theagentic.ai",
     points: [
@@ -245,20 +241,20 @@ export type Photo = {
 // shot. If you want them, add a `caption` field here and render it in PhotoGrid.
 export const photos: Photo[] = [
   {
-    slug: "fog-trees",
+    slug: "cave-mouth",
     col: 0,
+    w: 1125,
+    h: 1500,
+    alt: "A figure sitting alone in the mouth of a sea cave, silhouetted against bright water and a limestone stack offshore.",
+    lqip: "data:image/webp;base64,UklGRpYAAABXRUJQVlA4IIoAAADQBACdASoUABsAPt1cqE0opSQiKA1REBuJZQC7AA3W8mhYHxvUDroIhN/hyurgAAD4oj8Wx8CBDaRWCG3EEf2sqc+3XaGFSFaJ2O13OisNdZpynEXHMZ0JRicLjz+1j++khz6STamWTxByu+6Xm0to+SNL1KPcxuoZ8oxrv/zAmmDsLYoEYr4WEAA=",
+  },
+  {
+    slug: "fog-trees",
+    col: 1,
     w: 1125,
     h: 1500,
     alt: "Two bare trees on a hillside in heavy fog, their branches meeting against a flat grey sky.",
     lqip: "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAABwBACdASoUABsAPtlWpUyoJKOiN/VYAQAbCWcAygBFX7f3wShdfnmfutAUAAD+5yZzC6/maFP7AjbFU3v2qQy4Od6sOJfsxqCIFHjkS9tzpd1cNXEvUAAA",
-  },
-  {
-    slug: "stage-blue",
-    col: 1,
-    w: 1125,
-    h: 1500,
-    alt: "A performer alone behind a booth on a vast blue-lit stage, seen over a crowd of raised phones.",
-    lqip: "data:image/webp;base64,UklGRooAAABXRUJQVlA4IH4AAADwBACdASoUABsAPtVYpEyoJSOiMAwBABqJagCdL3WB0xZS8EkL3NTsKOzhJDCzk8AA/vVvsFoGHajN9YvRCtmXIEVdgwyhn8+2wxNKOe63OLkymLSV8vV0PPwK16fdds4bp9o9TrKfFcARJ1JcIbrLRxJBeVjpMk/AaThAAAA=",
   },
   {
     slug: "longtail-sunbeams",
@@ -269,8 +265,16 @@ export const photos: Photo[] = [
     lqip: "data:image/webp;base64,UklGRowAAABXRUJQVlA4IIAAAACwBACdASoUABQAPt1cqE0opSQiKA1REBuJZwDKABIlzUdKLf0Y0h4eiQ7vAsgAAP3v2maz3TP30FP2+6kcfYzJD5K267Pk80hySqfrjcIHs0hJ8GlKKfX54zWNk/ZhqnYaDf+TTtBkCBwF1sPzMZLBPOqWIedptIeELCjprOAAAA==",
   },
   {
-    slug: "fort-lake",
+    slug: "stage-blue",
     col: 1,
+    w: 1125,
+    h: 1500,
+    alt: "A performer alone behind a booth on a vast blue-lit stage, seen over a crowd of raised phones.",
+    lqip: "data:image/webp;base64,UklGRooAAABXRUJQVlA4IH4AAADwBACdASoUABsAPtVYpEyoJSOiMAwBABqJagCdL3WB0xZS8EkL3NTsKOzhJDCzk8AA/vVvsFoGHajN9YvRCtmXIEVdgwyhn8+2wxNKOe63OLkymLSV8vV0PPwK16fdds4bp9o9TrKfFcARJ1JcIbrLRxJBeVjpMk/AaThAAAA=",
+  },
+  {
+    slug: "fort-lake",
+    col: 0,
     w: 1125,
     h: 1500,
     alt: "A hilltop fort wall dropping away to a hazy lake far below, with visitors climbing the mossy steps.",
@@ -278,7 +282,7 @@ export const photos: Photo[] = [
   },
   {
     slug: "valley-tree",
-    col: 0,
+    col: 1,
     w: 1125,
     h: 1500,
     alt: "Two monkeys running along a branch of a broad tree that frames a green valley and distant fields.",
@@ -286,7 +290,7 @@ export const photos: Photo[] = [
   },
   {
     slug: "fisherman-dusk",
-    col: 1,
+    col: 0,
     w: 1500,
     h: 828,
     alt: "A lone figure casting a fishing line from black rocks at dusk, with moored sailboats scattered across the bay.",
@@ -323,36 +327,36 @@ export const systems: System[] = [
   {
     title: "Conversational agent layer over a project-management platform",
     domain: "Construction operations",
-    body: "A chat surface that lets site and office staff read and write project records — requests for information, daily logs, inspections, budgets, change orders — in natural language instead of navigating roughly ninety separate screens. Rather than hand-writing the tool surface, a generator reflects 131 ORM models, classifies them by column shape, and emits ~520 intent tools plus the agents that own them, so the tools track a schema that keeps moving.",
-    hard: "No single model call can choose sensibly among 520 tools, so requests route through an orchestrator-worker tree — a router, ten domain coordinators, and 86 object-level workers — with per-turn tool selection capped at eight and context isolated per subagent. Every mutating action stops for human approval, which the graph library can't do at the leaves — an interrupt only resumes inside the graph that owns the checkpointer. Mutating tools were inverted into proposers that return a proposal instead of executing, and one confirm-and-execute tool at the router carries the approval gate. Identity and tenancy bind from request-scoped context and never enter the model-facing signature, so the model cannot set who owns a row or widen an organisation's scope even by editing a proposal.",
+    body: "A chat surface that lets site and office staff read and write project records — requests for information, daily logs, inspections, budgets, change orders — in natural language instead of navigating roughly ninety separate screens. Rather than hand-writing the tool surface, a generator reflects *131 ORM models*, classifies them by column shape, and emits *~520 intent tools* plus the agents that own them, so the tools track a schema that keeps moving.",
+    hard: "No single model call can choose sensibly among 520 tools, so requests route through an *orchestrator-worker tree* — a router, ten domain coordinators, and 86 object-level workers — with per-turn tool selection capped at eight and context isolated per subagent. Every mutating action stops for human approval, which the graph library can't do at the leaves — an interrupt only resumes inside the graph that owns the checkpointer. *Mutating tools were inverted into proposers* that return a proposal instead of executing, and one confirm-and-execute tool at the router carries the approval gate. *Identity and tenancy bind from request-scoped context* and never enter the model-facing signature, so the model cannot set who owns a row or widen an organisation's scope even by editing a proposal.",
     stack: ["Python", "FastAPI", "LangGraph", "LangChain", "Postgres", "SQLAlchemy", "SSE", "React"],
   },
   {
     title: "Explainable admissions matching and scoring engine",
     domain: "Higher-education advising",
     body: "Turns a structured student profile into a ranked, tier-labelled shortlist drawn from ~2,500 institutions, scored on two independent axes: admissions probability and preference fit. Every scoring node emits its inputs, its formula, and the branch it took, which the interface renders as a navigable graph so a non-technical adviser can click any number and read the arithmetic that produced it.",
-    hard: "The authoritative data is heterogeneous and mostly missing — the figures that matter most are the ones institutions most often omit. Missingness had to become a first-class scoring concept: components deactivate rather than defaulting to zero, weights renormalise across whatever survived, and per-factor weights come from each institution's own published importance ratings rather than one global guess. A language model reranks and narrates but cannot introduce facts: a grounding validator re-extracts every numeric token from the generated text and fails the whole response back to deterministic output on any mismatch.",
+    hard: "The authoritative data is heterogeneous and mostly missing — the figures that matter most are the ones institutions most often omit. *Missingness had to become a first-class scoring concept*: components deactivate rather than defaulting to zero, weights renormalise across whatever survived, and per-factor weights come from each institution's own published importance ratings rather than one global guess. A language model reranks and narrates but cannot introduce facts: a *grounding validator* re-extracts every numeric token from the generated text and fails the whole response back to deterministic output on any mismatch.",
     stack: ["Python", "FastAPI", "Postgres", "pgvector", "ARQ", "Pydantic AI", "React", "React Flow"],
   },
   {
     title: "Multi-agent assistant over a sales team's existing stack",
     domain: "Sales productivity",
     body: "An orchestrator-worker system: a lead agent delegates to eight specialists — CRM, email, calendar, chat, spreadsheets, file storage, web research, coaching — each bound to the individual user's own authorised connections rather than a shared service account. It runs a read-only advisory mode and an action mode that writes to those systems, streaming execution traces to both a web app and a browser side panel.",
-    hard: "Every write to a system you don't own is irreversible, so mutations split into a pure preview step and a separate executor, with approval state carried across turns in a Postgres checkpointer keyed by conversation. That needs prompt-level guards too: an already-approved draft must never be silently redrafted, and \"do it, but change one thing\" has to be treated as a new request rather than an approval. The third-party CRM also returns an unstable response envelope, so reads defend through several unwrapping layers with a list-and-filter fallback when the vendor's own search fails.",
+    hard: "Every write to a system you don't own is irreversible, so mutations split into a *pure preview step and a separate executor*, with approval state carried across turns in a Postgres checkpointer keyed by conversation. That needs prompt-level guards too: an already-approved draft must never be silently redrafted, and \"do it, but change one thing\" has to be treated as a new request rather than an approval. The third-party CRM also returns an unstable response envelope, so reads defend through several unwrapping layers with a list-and-filter fallback when the vendor's own search fails.",
     stack: ["Python", "FastAPI", "LangGraph", "Postgres", "pgvector", "OAuth", "Stripe", "SSE"],
   },
   {
     title: "Property and field-service operations app",
     domain: "Property management",
     body: "A cross-platform mobile client, shipped to the App Store, covering a property portfolio, an owner and vendor directory, and the full lifecycle of service jobs — outreach, site visits, quotes, negotiation, completion — across 46 screens. It adds a connected calendar, device-contact import behind an explicit second consent gate, and location-scoped vendor discovery on top of a REST backend.",
-    hard: "Notification action buttons resolve a business decision without ever bringing the app to the foreground, so the response handler has to authenticate and post to the backend directly, with separate paths for an action press, a plain tap, and an action identifier it doesn't recognise. A sixteen-state job lifecycle surfaced as a stepper means a status change invalidates cache keys the mutation site cannot name statically — invalidation runs by predicate-matching over the query cache instead. Native modules are required lazily inside try/catch so the bundle still loads where they're absent.",
+    hard: "Notification action buttons resolve a business decision *without ever bringing the app to the foreground*, so the response handler has to authenticate and post to the backend directly, with separate paths for an action press, a plain tap, and an action identifier it doesn't recognise. A sixteen-state job lifecycle surfaced as a stepper means a status change invalidates cache keys the mutation site cannot name statically — invalidation runs by *predicate-matching over the query cache* instead. Native modules are required lazily inside try/catch so the bundle still loads where they're absent.",
     stack: ["TypeScript", "React Native", "Expo", "TanStack Query", "APNs / FCM", "Swift"],
   },
   {
     title: "Operator console for an agentic workflow platform",
     domain: "Freight and logistics operations",
     body: "A multi-tenant platform where operations staff assemble workflows on a visual canvas — pulling records from a transport management system, branching on them, calling models, sending mail, placing calls, and driving vendor portals through a remote headless browser where no API exists. Two execution substrates sit side by side: a node-graph engine for user-authored workflows, and a step-sequence coordinator for long browser runs with human checkpoints. Runs are triggered manually, on cron, on internal events, by webhook, or by polling.",
-    hard: "A run outlives the tab that started it, so the operator-facing half is the difficult half. Progress events are buffered server-side and replayed in order when a client attaches late or reconnects, and the stepper has to flatten a nested, conditional step tree and reveal branches as they're actually taken — otherwise a run that began before the tab was open reads as broken rather than in progress. Human-in-the-loop is a real step type that blocks on an event with a per-step timeout and releases the leased browser on rejection or expiry, which means the approval interface owns a countdown and an edit round-trip, not just a yes and a no.",
+    hard: "*A run outlives the tab that started it*, so the operator-facing half is the difficult half. Progress events are *buffered server-side and replayed in order* when a client attaches late or reconnects, and the stepper has to flatten a nested, conditional step tree and reveal branches as they're actually taken — otherwise a run that began before the tab was open reads as broken rather than in progress. Human-in-the-loop is a real step type that blocks on an event with a per-step timeout and releases the leased browser on rejection or expiry, which means the approval interface owns a countdown and an edit round-trip, not just a yes and a no.",
     stack: ["React", "TypeScript", "React Flow", "TanStack Query", "WebSockets", "Python", "FastAPI"],
     role: "Dominant frontend author and largest contributor of five. Owned the real-time operator layer — the run-progress stepper, the human-in-the-loop modal, the session viewer, the WebSocket hook, and the data-fetching layer — plus the auth flows and analytics surface. On the backend I contributed model prompt formatting for thread analysis and a geocoding fallback chain with negative-result caching. The graph engine and tool registry were a colleague's.",
   },
@@ -360,7 +364,7 @@ export const systems: System[] = [
     title: "Case management with national court-record sync",
     domain: "Legal, regulated market",
     body: "A practice platform that imports and continuously re-syncs matters from a national court-records API, tracking docket movements, official notices, and filing deadlines, with an agent that produces versioned document artefacts. Access is governed by firm-level roles, per-matter team assignments with row-level visibility, and a confidentiality seal for restricted matters.",
-    hard: "The upstream API is asynchronous, credit-metered, and weakly documented, and every call costs real money — so the interface had to make that asynchrony legible rather than hide it. Long lookups start a job and poll on an interval written specifically to survive a transient not-yet-visible state that would otherwise read as failure, and bulk import is a job-preview-confirm flow so credits are only spent on confirm. The agent's tool-call trace streams through a hand-written frame reader whose error type distinguishes a connection failure before anything persisted, which is safe to retry, from a mid-stream failure, where retrying would write the turn twice.",
+    hard: "The upstream API is asynchronous, credit-metered, and weakly documented, and every call costs real money — so the interface had to make that asynchrony legible rather than hide it. Long lookups start a job and poll on an interval written specifically to survive a transient not-yet-visible state that would otherwise read as failure, and bulk import is a job-preview-confirm flow so credits are only spent on confirm. The agent's tool-call trace streams through a hand-written frame reader whose error type distinguishes *a connection failure before anything persisted*, which is safe to retry, from a mid-stream failure, where retrying would write the turn twice.",
     stack: ["React", "TypeScript", "TanStack Query", "FastAPI", "Postgres", "Redis", "Celery", "SSE"],
     role: "Led the frontend — agent chat surface, matter pages, deadlines with calendar sync, and role-based member management. Contributed the backend streaming and persistence of agent step traces and versioned artefacts. The court-sync service layer was largely a colleague's.",
   },
@@ -368,7 +372,7 @@ export const systems: System[] = [
     title: "Two-sided platform for personal finance and advisers",
     domain: "Consumer fintech and wealth advisory",
     body: "One application with two role surfaces over a shared design system: a dashboard where people with irregular income see aggregated net worth, linked accounts, cash flow, goals, and debt payoff; and an adviser workspace for managing a client book through decisions, alerts, an advice ledger, and execution tracking. 46 routed pages behind a single token layer.",
-    hard: "Header-based auth sessions can't attach a token to the browser's own EventSource, so both live surfaces needed hand-rolled readers over fetch: one reassembles multi-line frames for a tool-calling chat that renders typed payload cards, the other does sequence-number gap detection and backoff reconnection for an adviser event feed. Retiring the design-file sample data was its own discipline — three line-by-line audits classifying every rendered value as live, mocked, or locally derived before replacing it, including optimistic mutations that walk every cached list containing a row, patch it in place, snapshot for rollback, and invalidate on settle.",
+    hard: "Header-based auth sessions *can't attach a token to the browser's own EventSource*, so both live surfaces needed hand-rolled readers over fetch: one reassembles multi-line frames for a tool-calling chat that renders typed payload cards, the other does sequence-number gap detection and backoff reconnection for an adviser event feed. Retiring the design-file sample data was its own discipline — three line-by-line audits classifying every rendered value as live, mocked, or locally derived before replacing it, including optimistic mutations that walk every cached list containing a row, patch it in place, snapshot for rollback, and invalidate on settle.",
     stack: ["React", "Next.js", "TypeScript", "Tailwind", "TanStack Query", "Web Workers", "FastAPI"],
     role: "Largest line contribution in the repo and dominant author of the adviser surface, the design-token layer, and the migration from raw fetch to a cached query layer. The projection and tax engines were a colleague's; I redesigned and extended their interface.",
   },
@@ -376,7 +380,7 @@ export const systems: System[] = [
     title: "Architecture audit and replatforming plan, five-service system",
     domain: "Education services",
     body: "A multi-tenant platform for AI-assisted advising sessions, spread across five services: a REST API that is the sole writer to a 64-table Postgres schema, a stateless agent runtime that holds no database credentials and reaches everything through service-authenticated tool calls, an event fan-out service, and two separate portals for families and firm staff.",
-    hard: "The interesting finding was that several seams had never actually been connected — the fan-out service validated tokens from a different identity provider than the API issued, the browser sent its credential as a query parameter while the handler read a header, and the agent runtime expected an HTTP tool endpoint the API exposed only over stdio. Establishing that required reverse-engineering the tool-server contract from the client code rather than from any spec, then scoring every service edge as real or assumed and arguing both sides of collapsing five services into two.",
+    hard: "The interesting finding was that *several seams had never actually been connected* — the fan-out service validated tokens from a different identity provider than the API issued, the browser sent its credential as a query parameter while the handler read a header, and the agent runtime expected an HTTP tool endpoint the API exposed only over stdio. Establishing that required reverse-engineering the tool-server contract from the client code rather than from any spec, then scoring every service edge as real or assumed and arguing both sides of collapsing five services into two.",
     stack: ["TypeScript", "Node", "Express", "Postgres", "pgvector", "Redis", "MCP", "SSE"],
     role: "This was an assessment, not an implementation — I wrote the cross-repo completion audit, the component coverage matrix, and the rebuild plan. None of the production code in these repositories is mine.",
   },

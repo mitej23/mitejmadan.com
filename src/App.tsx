@@ -3,6 +3,7 @@ import { usePath } from "./lib/router";
 import { profile } from "./content";
 import { Nav } from "./components/Nav";
 import { Footer } from "./components/Footer";
+import { HeroWash } from "./components/HeroWash";
 import { Home } from "./pages/Home";
 import { Projects } from "./pages/Projects";
 import { Experience } from "./pages/Experience";
@@ -32,6 +33,7 @@ export function App() {
   return (
     <>
       <Nav />
+      {path === "/" && <HeroWash />}
 
       {/* Keying on `path` remounts the tree on navigation, which replays every
           `.enter` and re-arms every `.reveal`. The route transition is therefore

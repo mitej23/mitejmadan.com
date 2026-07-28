@@ -1,5 +1,6 @@
 import type { Project } from "../content";
 import { Reveal } from "./Reveal";
+import { Rich } from "./Rich";
 
 /**
  * One project. The hover fill is a pseudo-element bled 12px past the measure, so
@@ -45,7 +46,7 @@ export function ProjectRow({ project, i }: { project: Project; i: number }) {
         </div>
 
         <p className="relative mt-1.5 text-[14px] leading-[1.6] text-ink-2">
-          {project.blurb}
+          <Rich text={project.blurb} />
         </p>
 
         <ul className="relative mt-2.5 flex flex-wrap gap-x-1.5 gap-y-1">

@@ -8,6 +8,7 @@ import { Reveal } from "../components/Reveal";
 import { Section } from "../components/Section";
 import { Socials } from "../components/Socials";
 import { Link } from "../lib/router";
+import { Rich } from "../components/Rich";
 
 const FEATURED = 4;
 
@@ -57,7 +58,9 @@ export function Home() {
         style={{ "--i": 5 } as React.CSSProperties}
       >
         {profile.intro.map((p) => (
-          <p key={p.slice(0, 24)}>{p}</p>
+          <p key={p.slice(0, 24)}>
+            <Rich text={p} />
+          </p>
         ))}
       </div>
 
@@ -69,7 +72,9 @@ export function Home() {
               <h3 className="text-[14.5px] leading-[1.3] font-semibold tracking-[-0.01em] text-ink">
                 {c.title}
               </h3>
-              <p className="text-[14px] leading-[1.65] text-ink-2">{c.body}</p>
+              <p className="text-[14px] leading-[1.65] text-ink-2">
+                <Rich text={c.body} />
+              </p>
             </Reveal>
           ))}
         </div>
@@ -133,7 +138,9 @@ export function Home() {
             <Photo />
           </Reveal>
           <Reveal i={1}>
-            <p className="text-[14.5px] leading-[1.68] text-ink-2">{offClock}</p>
+            <p className="text-[14.5px] leading-[1.68] text-ink-2">
+              <Rich text={offClock} />
+            </p>
           </Reveal>
         </div>
       </Section>

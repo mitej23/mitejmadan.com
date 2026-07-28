@@ -1,5 +1,6 @@
 import type { Role } from "../content";
 import { Reveal } from "./Reveal";
+import { Rich } from "./Rich";
 
 export function RoleRow({ role, i }: { role: Role; i: number }) {
   const present = role.end === "Present";
@@ -39,7 +40,7 @@ export function RoleRow({ role, i }: { role: Role; i: number }) {
             key={p}
             className="relative pl-4 text-[14px] leading-[1.6] text-ink-2 before:absolute before:top-[0.62em] before:left-0 before:size-[3px] before:rounded-full before:bg-ink-4"
           >
-            {p}
+            <Rich text={p} />
           </li>
         ))}
       </ul>
