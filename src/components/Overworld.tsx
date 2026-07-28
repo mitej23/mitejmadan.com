@@ -35,9 +35,11 @@ export function Overworld() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [pixelStep, setPixelStep] = useState(0);
   const [loadFailed, setLoadFailed] = useState(false);
+  const [slow, setSlow] = useState(false);
 
   const hostRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<GameHandle | null>(null);
+  const modRef = useRef<{ mountGame: (el: HTMLElement) => Promise<GameHandle> } | null>(null);
   const timers = useRef<number[]>([]);
   /** Where the reader was, so leaving puts them back rather than at the top. */
   const scrollY = useRef(0);
@@ -57,6 +59,7 @@ export function Overworld() {
     gameRef.current = null;
     setPhase("idle");
     setPixelStep(0);
+    setSlow(false);
     document.documentElement.classList.remove("ow-lock");
     // Restore the reading position and the focus ring we took.
     requestAnimationFrame(() => {
@@ -73,46 +76,89 @@ export function Overworld() {
 
     const reduced = prefersReducedMotion();
 
-    // Start fetching the engine immediately — the transition is cover for the
-    // download, not a delay bolted in front of it.
-    const loading = import("../game/mount").catch((e) => {
+    // Fetch the engine immediately, so the transition is cover for the download
+    // rather than a delay bolted in front of it.
+    const loading = import("../game/mount").catch((e: unknown) => {
       console.error(e);
-      setLoadFailed(true);
       return null;
     });
 
+    // Wait for the pixelate to finish AND the module to arrive before wiping to
+    // black. Wiping on a fixed timer meant a slow chunk left the viewer staring
+    // at a black overlay for however long the network took — the transition has
+    // to be the slower of the two, not the faster.
+    let holdSlow: number | undefined;
     if (reduced) {
-      setPhase("wiping");
+      setPixelStep(0);
     } else {
       setPhase("pixelating");
       for (let i = 1; i <= PIXEL_STEPS; i++) {
         after(i * STEP_MS, () => setPixelStep(i));
       }
-      after(PIXEL_STEPS * STEP_MS + 40, () => setPhase("wiping"));
+      // If the wait runs long, say so instead of looking frozen.
+      holdSlow = window.setTimeout(() => setSlow(true), 1200);
+      timers.current.push(holdSlow);
     }
 
-    const mod = await loading;
+    const settle = reduced
+      ? Promise.resolve()
+      : new Promise<void>((r) => after(PIXEL_STEPS * STEP_MS + 40, r));
+
+    const [mod] = await Promise.all([loading, settle]);
+
+    clearTimeout(holdSlow);
+    setSlow(false);
+
     if (!mod) {
+      setLoadFailed(true);
       exit();
       return;
     }
 
-    after(reduced ? 0 : WIPE_MS, async () => {
-      document.documentElement.classList.add("ow-lock");
-      setPhase("playing");
-      // The host only exists once phase is "playing", so wait a frame for it.
-      requestAnimationFrame(async () => {
-        if (!hostRef.current) return;
-        try {
-          gameRef.current = await mod.mountGame(hostRef.current);
-          hostRef.current.focus();
-        } catch (e) {
-          console.error(e);
-          setLoadFailed(true);
-          exit();
+    modRef.current = mod;
+    setPhase("wiping");
+    after(reduced ? 0 : WIPE_MS, () => setPhase("playing"));
+  }, [phase, exit]);
+
+  /**
+   * Mount from an effect rather than a rAF after setState: effects run after
+   * React has committed, so hostRef is guaranteed to exist. The previous version
+   * bailed out silently when the ref was null, which left the overlay up and the
+   * game unmounted with nothing logged — a black screen and no error.
+   */
+  useEffect(() => {
+    if (phase !== "playing") return;
+    const host = hostRef.current;
+    const mod = modRef.current;
+    if (!host || !mod) {
+      setLoadFailed(true);
+      exit();
+      return;
+    }
+
+    let cancelled = false;
+    document.documentElement.classList.add("ow-lock");
+
+    mod
+      .mountGame(host)
+      .then((handle) => {
+        if (cancelled) {
+          handle.destroy();
+          return;
         }
+        gameRef.current = handle;
+        host.focus();
+      })
+      .catch((e: unknown) => {
+        console.error(e);
+        if (cancelled) return;
+        setLoadFailed(true);
+        exit();
       });
-    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [phase, exit]);
 
   // Escape always leaves. The game must never be something you get stuck in.
@@ -146,6 +192,15 @@ export function Overworld() {
 
       {phase === "wiping" && <TileWipe />}
 
+      {slow && (
+        <p
+          role="status"
+          className="fixed inset-x-0 top-1/2 z-70 text-center text-[13px] font-medium text-ink-2"
+        >
+          Loading overworld…
+        </p>
+      )}
+
       {phase === "playing" && (
         <div className="fixed inset-0 z-70 bg-[#0b0b0a]">
           <div
@@ -155,14 +210,26 @@ export function Overworld() {
             className="size-full outline-none"
           />
           <p className="pointer-events-none absolute inset-x-0 bottom-4 text-center text-[12px] text-white/55">
-            Arrows / WASD to walk · <kbd className="font-sans">Esc</kbd> to leave
+            Arrows / WASD to walk · <kbd className="font-sans">Esc</kbd> to go back
           </p>
           <button
             type="button"
             onClick={exit}
-            className="absolute top-4 right-4 rounded-full bg-white/10 px-3 py-1.5 text-[12px] font-medium text-white/80 backdrop-blur transition-colors hover:bg-white/20 hover:text-white"
+            className="group absolute top-4 right-4 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-2 text-[12.5px] font-medium text-white/85 backdrop-blur transition-colors hover:bg-white/20 hover:text-white"
           >
-            Leave
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.8}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+              className="size-3.5 transition-transform duration-200 group-hover:-translate-x-0.5"
+            >
+              <path d="M20 12H5M11 18l-6-6 6-6" />
+            </svg>
+            Back to résumé
           </button>
         </div>
       )}

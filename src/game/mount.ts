@@ -29,8 +29,12 @@ const TARGET_TILES_WIDE = 17; // how much world to show; drives integer scale
 const ROW_DOWN = 0;
 const ROW_SIDE = 1;
 const ROW_UP = 2;
-/** Set false if the side row turns out to face right in the source art. */
-const SIDE_FACES_LEFT = true;
+/**
+ * The side row in this sheet faces RIGHT, so only "left" gets mirrored.
+ * Confirmed the hard way: with this set the other way, walking right rendered the
+ * left-facing sprite and vice versa.
+ */
+const SIDE_FACES_LEFT = false;
 
 type Dir = "up" | "down" | "left" | "right";
 
