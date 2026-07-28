@@ -11,19 +11,32 @@
  * it read as Gen 3 rather than as a platformer.
  */
 
+import {
+  BUILDINGS, BUSHES, BUSH_SRC, FENCE_H, FENCE_V, FLOWERS, FLOWER_SRC,
+  GRASS_EDGE_TILE, GRASS_TILE, MAP_H, MAP_W, PATH, PATH_TILE, SPAWN,
+  TALL_GRASS, buildCollision,
+} from "./map";
+
 const TILE = 16; // source tile size, px
 const SHEET_COLS = 12; // grass.png is 192px / 16 = 12 tiles wide
+const FENCE_COLS = 4;
 /**
  * Tile indices into grass.png (12 wide). Verified by cropping the sheet, not
  * guessed: row 4 is flat colour fills, rows 1-3 cols 2-3 are the dithered
  * textures, and col 1 of each row is a checkerboard blend pattern.
  */
-const GRASS = 26; // row 2, col 2 — mid dithered grass
-const GRASS_ALT = 27; // row 2, col 3 — a second texture, scattered for variation
-const GRASS_DARK = 14; // row 1, col 2 — darker, used for the map edge
 const STEP_FRAMES = 8; // frames to cross one tile
 const CHAR = 32; // trainer frame size
-const TARGET_TILES_WIDE = 17; // how much world to show; drives integer scale
+/**
+ * How much world is visible across the canvas.
+ *
+ * Ten tiles is true Gen 3 framing, but a game fills a handheld screen whereas
+ * this is a panel inside a website — at that zoom the sprite dwarfed the type it
+ * sits next to. Twenty-eight keeps the character close to the scale of the
+ * surrounding text and shows most of the 36-wide town at once, so it reads as a
+ * place rather than a corridor.
+ */
+const TARGET_TILES_WIDE = 28;
 
 /** Trainer sheet rows. Left is the side row mirrored. */
 const ROW_DOWN = 0;
@@ -49,21 +62,15 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-/** A plain field with a fence border — enough to prove movement and camera. */
-function buildMap(w: number, h: number) {
-  const solid = new Uint8Array(w * h);
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      if (x === 0 || y === 0 || x === w - 1 || y === h - 1) solid[y * w + x] = 1;
-    }
-  }
-  return { w, h, solid };
-}
-
 export async function mountGame(host: HTMLElement): Promise<GameHandle> {
-  const [grass, trainer] = await Promise.all([
+  const [grass, trainer, buildings, path, fences, bush, flowers] = await Promise.all([
     loadImage("/game/grass.png"),
     loadImage("/game/trainer.png"),
+    loadImage("/game/buildings.png"),
+    loadImage("/game/path.png"),
+    loadImage("/game/fences.png"),
+    loadImage("/game/bush.png"),
+    loadImage("/game/flowers.png"),
   ]);
 
   const canvas = document.createElement("canvas");
@@ -75,7 +82,8 @@ export async function mountGame(host: HTMLElement): Promise<GameHandle> {
 
   const ctx = canvas.getContext("2d", { alpha: false })!;
 
-  const map = buildMap(40, 30);
+  const { solid: solidMap } = buildCollision();
+  const map = { w: MAP_W, h: MAP_H, solid: solidMap };
   let scale = 3;
 
   function resize() {
@@ -97,14 +105,17 @@ export async function mountGame(host: HTMLElement): Promise<GameHandle> {
   resize();
 
   // ── player ────────────────────────────────────────────────────────────────
-  let tx = 5;
-  let ty = 5;
-  let dir: Dir = "down";
+  let tx = SPAWN.x;
+  let ty = SPAWN.y;
+  // Facing north on arrival, so the first frame looks up the street at the town.
+  let dir: Dir = "up";
   /** 0 while idle, counts up to STEP_FRAMES while crossing a tile. */
   let step = 0;
   let fromX = tx;
   let fromY = ty;
   let animTick = 0;
+  /** Advances per completed step, so the left/right step poses alternate. */
+  let walkPhase = 0;
 
   const held = new Set<Dir>();
   const KEYS: Record<string, Dir> = {
@@ -161,6 +172,7 @@ export async function mountGame(host: HTMLElement): Promise<GameHandle> {
         step = 0;
         fromX = tx;
         fromY = ty;
+        walkPhase = (walkPhase + 2) % 4;
       }
       return;
     }
@@ -217,53 +229,128 @@ export async function mountGame(host: HTMLElement): Promise<GameHandle> {
     ctx.scale(scale, scale);
     ctx.translate(-camX, -camY);
 
-    // Ground: only the tiles actually on screen.
+    // ── ground ────────────────────────────────────────────────────────────
     const x0 = Math.max(0, Math.floor(camX / TILE));
     const y0 = Math.max(0, Math.floor(camY / TILE));
     const x1 = Math.min(map.w, Math.ceil((camX + viewW) / TILE));
     const y1 = Math.min(map.h, Math.ceil((camY + viewH) / TILE));
 
+    const blit = (
+      img: HTMLImageElement,
+      tile: number,
+      cols: number,
+      dx: number,
+      dy: number,
+    ) => {
+      ctx.drawImage(
+        img,
+        (tile % cols) * TILE,
+        Math.floor(tile / cols) * TILE,
+        TILE,
+        TILE,
+        dx,
+        dy,
+        TILE,
+        TILE,
+      );
+    };
+
     for (let y = y0; y < y1; y++) {
       for (let x = x0; x < x1; x++) {
-        // Deterministic scatter — a cheap hash, so the field has texture variation
-        // without ever shimmering between frames.
-        const solid = map.solid[y * map.w + x] === 1;
-        const alt = ((x * 73856093) ^ (y * 19349663)) % 7 === 0;
-        const tile = solid ? GRASS_DARK : alt ? GRASS_ALT : GRASS;
-        ctx.drawImage(
-          grass,
-          (tile % SHEET_COLS) * TILE,
-          Math.floor(tile / SHEET_COLS) * TILE,
-          TILE,
-          TILE,
-          x * TILE,
-          y * TILE,
-          TILE,
-          TILE,
-        );
+        const edge = x === 0 || y === 0 || x === map.w - 1 || y === map.h - 1;
+        blit(grass, edge ? GRASS_EDGE_TILE : GRASS_TILE, SHEET_COLS, x * TILE, y * TILE);
+        if (PATH.has(y * map.w + x)) {
+          blit(path, PATH_TILE, SHEET_COLS, x * TILE, y * TILE);
+        }
       }
     }
 
-    // Player. Frames cycle only while walking; frame 0 is the standing pose.
+    // Flat decoration sits on the ground, under everything that has height.
+    for (const [fx, fy, kind] of FLOWERS) {
+      const [sx, sy, sw, sh] = FLOWER_SRC[kind];
+      ctx.drawImage(flowers, sx, sy, sw, sh, fx * TILE, fy * TILE, sw, sh);
+    }
+
+    // ── fence ring ────────────────────────────────────────────────────────
+    for (let x = x0; x < x1; x++) {
+      if (x !== SPAWN.x) blit(fences, FENCE_H, FENCE_COLS, x * TILE, (map.h - 1) * TILE);
+      blit(fences, FENCE_H, FENCE_COLS, x * TILE, 0);
+    }
+    for (let y = y0; y < y1; y++) {
+      blit(fences, FENCE_V, FENCE_COLS, 0, y * TILE);
+      blit(fences, FENCE_V, FENCE_COLS, (map.w - 1) * TILE, y * TILE);
+    }
+
+    // ── depth-sorted layer ────────────────────────────────────────────────
+    // Everything with height goes into one list ordered by the Y its base sits
+    // on, so you walk behind a building's roof and in front of its doorstep.
+    // Without this the illusion collapses the first time you round a corner.
+    type Drawable = { baseY: number; paint: () => void };
+    const layer: Drawable[] = [];
+
+    for (const b of BUILDINGS) {
+      const [sx, sy, sw, sh] = b.src;
+      const bottom = (b.ty + b.th) * TILE;
+      layer.push({
+        baseY: bottom,
+        paint: () => ctx.drawImage(buildings, sx, sy, sw, sh, b.tx * TILE, bottom - sh, sw, sh),
+      });
+    }
+
+    for (const [bx, by] of [...BUSHES, ...TALL_GRASS]) {
+      const [sx, sy, sw, sh] = BUSH_SRC;
+      layer.push({
+        baseY: (by + 1) * TILE,
+        paint: () =>
+          ctx.drawImage(
+            bush, sx, sy, sw, sh,
+            bx * TILE + (TILE - sw) / 2,
+            (by + 1) * TILE - sh,
+            sw, sh,
+          ),
+      });
+    }
+
+    // The player. Content occupies rows 10-25 of the 32px frame — measured, not
+    // guessed — so the sprite is offset to stand its feet on the tile floor
+    // rather than on the frame's empty bottom padding.
+    const FOOT = 25;
+    const dx = px - (CHAR - TILE) / 2;
+    const dy = py + (TILE - 1) - FOOT;
     const walking = step > 0;
-    const frame = walking ? 1 + (Math.floor(animTick / 1) % 2) * 2 : 0;
+    const CYCLE = [0, 1, 0, 2];
+    const frame = walking ? CYCLE[(walkPhase + Math.floor(t * 2)) % CYCLE.length] : 0;
     const row = dir === "up" ? ROW_UP : dir === "down" ? ROW_DOWN : ROW_SIDE;
     const mirror =
       (dir === "left" && !SIDE_FACES_LEFT) || (dir === "right" && SIDE_FACES_LEFT);
 
-    // The sprite is 32px on a 16px grid, so centre it and sit its feet on the tile.
-    const dx = px - (CHAR - TILE) / 2;
-    const dy = py - (CHAR - TILE);
+    layer.push({
+      baseY: py + TILE,
+      paint: () => {
+        // Soft ground shadow: the cheapest thing that makes a sprite sit in the
+        // world instead of floating on it.
+        ctx.save();
+        ctx.globalAlpha = 0.2;
+        ctx.fillStyle = "#1a2416";
+        ctx.beginPath();
+        ctx.ellipse(px + TILE / 2, py + TILE - 2, 4.5, 1.8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
 
-    ctx.save();
-    if (mirror) {
-      ctx.translate(dx + CHAR, dy);
-      ctx.scale(-1, 1);
-      ctx.drawImage(trainer, frame * CHAR, row * CHAR, CHAR, CHAR, 0, 0, CHAR, CHAR);
-    } else {
-      ctx.drawImage(trainer, frame * CHAR, row * CHAR, CHAR, CHAR, dx, dy, CHAR, CHAR);
-    }
-    ctx.restore();
+        if (mirror) {
+          ctx.save();
+          ctx.translate(dx + CHAR, dy);
+          ctx.scale(-1, 1);
+          ctx.drawImage(trainer, frame * CHAR, row * CHAR, CHAR, CHAR, 0, 0, CHAR, CHAR);
+          ctx.restore();
+        } else {
+          ctx.drawImage(trainer, frame * CHAR, row * CHAR, CHAR, CHAR, dx, dy, CHAR, CHAR);
+        }
+      },
+    });
+
+    layer.sort((a, b) => a.baseY - b.baseY);
+    for (const d of layer) d.paint();
 
     ctx.restore();
   }
