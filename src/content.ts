@@ -14,7 +14,7 @@
 
 export const profile = {
   name: "Mitej Madan",
-  role: "Full Stack Engineer",
+  role: "AI & Full Stack Engineer",
   // Shown as the status line under the name. Keep it to one clause.
   status: "Building agent infrastructure at TheAgentic.",
   location: "Mumbai, India",
@@ -179,7 +179,7 @@ export type Role = {
 export const experience: Role[] = [
   {
     company: "TheAgentic",
-    title: "Full Stack Engineer",
+    title: "AI & Full Stack Engineer",
     start: "Dec 2024",
     end: "Present",
     href: "https://theagentic.ai",
