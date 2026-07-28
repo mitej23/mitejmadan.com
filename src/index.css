@@ -27,6 +27,22 @@
     U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/**
+ * Pixelify Sans — the overworld's typeface. Declared here but never fetched by
+ * the base site: a browser only downloads a @font-face file when an element
+ * actually rendering it appears, and nothing outside the overworld uses it.
+ */
+@font-face {
+  font-family: "Pixelify Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/pixelify-sans-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────
    Tokens
    ───────────────────────────────────────────────────────────────────────────── */
@@ -360,6 +376,52 @@
     50% {
       opacity: 0;
     }
+  }
+
+  /**
+   * Overworld UI type. A pixel face is only crisp when it isn't smoothed, so
+   * antialiasing is switched off here — the site body turns it on, and inheriting
+   * that makes the glyphs mushy at these sizes.
+   *
+   * Pixel faces also carry almost no weight range, so hierarchy has to come from
+   * scale, case and space rather than from boldness. Line-height is deliberately
+   * looser than the site's: hard-edged glyphs need more air to stay readable in a
+   * paragraph.
+   */
+  .ow-ui {
+    /**
+     * The overworld is always dark regardless of the site's theme, so it cannot
+     * use --color-accent: in light mode that token is a dark ember and lands at
+     * 3.3:1 on this panel. This is a fixed light ember instead.
+     */
+    --ow-accent: oklch(0.8 0.14 58);
+    font-family: "Pixelify Sans", ui-monospace, monospace;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: unset;
+    font-smooth: never;
+    letter-spacing: 0.01em;
+  }
+
+  .ow-ui p,
+  .ow-ui li {
+    line-height: 1.75;
+  }
+
+  /**
+   * Long prose opts back out of the pixel face.
+   *
+   * Pixelify's digits are ambiguous with smoothing off — at 13px "~520" reads as
+   * "-820", and these paragraphs carry load-bearing numbers (520 tools, 131
+   * models, 86 workers). Misreading them is worse than any styling gain. So the
+   * chrome — kickers, titles, labels, chips, buttons, counters — stays pixel and
+   * carries the gamified feel, while multi-sentence content stays legible.
+   */
+  .ow-prose {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    font-smooth: auto;
+    letter-spacing: normal;
+    line-height: 1.65;
   }
 
   /* Link underline that grows from the left on hover — cheap, transform-only,

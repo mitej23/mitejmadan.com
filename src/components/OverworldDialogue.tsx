@@ -50,7 +50,7 @@ export function pagesFor(topic: string): Page[] {
         {
           kicker: "Shelf",
           title: `${systems.length} systems`,
-          body: "Client and product names are left out on purpose. What's kept is the sector, the architecture, and the engineering.",
+          body: "Names left out on purpose. What's kept is the sector, the architecture, and the engineering.",
           items: systems.map((s) => `${s.domain} — ${s.title}`),
         },
         ...systems.map((s, i) => ({
@@ -94,7 +94,6 @@ export function pagesFor(topic: string): Page[] {
         {
           kicker: "Shelf",
           title: "Stack",
-          body: "What I actually build with.",
           aside: stack.map((g) => ({ label: g.group, text: g.items.join(", ") })),
         },
       ];
@@ -149,32 +148,46 @@ export function Dialogue({ pages, onClose }: { pages: Page[]; onClose: () => voi
       aria-modal="true"
       aria-label={page.title}
       tabIndex={-1}
-      className="absolute inset-x-0 bottom-0 z-10 max-h-[62%] outline-none sm:inset-y-0 sm:right-0 sm:left-auto sm:max-h-none sm:w-[24rem]"
+      className="ow-ui absolute inset-x-0 bottom-0 z-20 max-h-[62%] outline-none sm:inset-y-0 sm:right-0 sm:left-auto sm:max-h-none sm:w-[25rem]"
     >
-      <div className="flex h-full flex-col border-t-[3px] border-white/80 bg-[#161c2b]/97 backdrop-blur sm:border-t-0 sm:border-l-[3px]">
+      <div className="flex h-full flex-col border-t-2 border-white/80 bg-[#151a28]/97 backdrop-blur sm:border-t-0 sm:border-l-2">
+        {/* The panel owns its own dismiss. Previously the only × on screen exited
+            the whole overworld, which read as "close this panel" and wasn't. */}
+        <div className="flex shrink-0 items-start gap-3 border-b border-white/10 px-5 py-4">
+          <div className="min-w-0 flex-1">
+            {page.kicker && (
+              <p className="mb-1.5 text-[10px] leading-none tracking-[0.14em] text-white/60 uppercase">
+                {page.kicker}
+              </p>
+            )}
+            <h2 className="text-[17px] leading-[1.35] text-white">{page.title}</h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close panel"
+            className="-mt-1 -mr-1 grid size-7 shrink-0 place-items-center rounded text-white/65 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <svg
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2}
+              strokeLinecap="round" aria-hidden className="size-3.5"
+            >
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
         <div ref={scroller} className="flex-1 overflow-y-auto px-5 py-5">
-          {page.kicker && (
-            <p className="mb-1.5 text-[10.5px] font-semibold tracking-[0.1em] text-white/45 uppercase">
-              {page.kicker}
-            </p>
-          )}
-
-          <h2 className="text-[16px] leading-[1.3] font-semibold tracking-[-0.01em] text-white">
-            {page.title}
-          </h2>
-
           {page.body && (
-            <p className="mt-2.5 text-[13.5px] leading-[1.6] whitespace-pre-line text-white/80">
-              {page.body}
-            </p>
+            <p className="ow-prose text-[13.5px] whitespace-pre-line text-white/80">{page.body}</p>
           )}
 
           {page.items && (
-            <ul className="mt-3.5 flex flex-col gap-2">
+            <ul className={`flex flex-col gap-2.5 ${page.body ? "mt-4" : ""}`}>
               {page.items.map((it) => (
                 <li
                   key={it}
-                  className="relative pl-3.5 text-[13px] leading-[1.55] text-white/75 before:absolute before:top-[0.6em] before:left-0 before:size-[3px] before:rounded-full before:bg-white/35"
+                  className="ow-prose relative pl-4 text-[13px] text-white/75 before:absolute before:top-[0.62em] before:left-0 before:size-[3px] before:bg-white/30"
                 >
                   {it}
                 </li>
@@ -182,24 +195,20 @@ export function Dialogue({ pages, onClose }: { pages: Page[]; onClose: () => voi
             </ul>
           )}
 
+          {/* Hairlines divide; nothing is boxed. */}
           {page.aside?.map((a) => (
-            <div key={a.label} className="mt-4 border-l border-white/20 pl-3.5">
-              <p className="mb-1 text-[10.5px] font-semibold tracking-[0.09em] text-white/40 uppercase">
+            <div key={a.label} className="mt-5 border-l border-white/15 pl-4">
+              <p className="mb-1.5 text-[10px] leading-none tracking-[0.14em] text-white/60 uppercase">
                 {a.label}
               </p>
-              <p className="text-[12.5px] leading-[1.6] whitespace-pre-line text-white/70">
-                {a.text}
-              </p>
+              <p className="ow-prose text-[13px] whitespace-pre-line text-white/70">{a.text}</p>
             </div>
           ))}
 
           {page.tags && (
-            <ul className="mt-4 flex flex-wrap gap-1.5">
+            <ul className="mt-5 flex flex-wrap gap-1.5">
               {page.tags.map((t) => (
-                <li
-                  key={t}
-                  className="rounded-[5px] bg-white/10 px-1.5 py-0.5 text-[11px] text-white/70"
-                >
+                <li key={t} className="bg-white/10 px-1.5 py-0.5 text-[11px] text-white/70">
                   {t}
                 </li>
               ))}
@@ -207,44 +216,36 @@ export function Dialogue({ pages, onClose }: { pages: Page[]; onClose: () => voi
           )}
         </div>
 
-        <div className="flex shrink-0 items-center justify-between border-t border-white/12 px-4 py-3">
+        <div className="flex shrink-0 items-center justify-between border-t border-white/10 px-5 py-3.5 text-[11px]">
           {many ? (
             <>
               <button
                 type="button"
                 onClick={() => setI((n) => Math.max(0, n - 1))}
                 disabled={i === 0}
-                className="rounded px-2 py-1 text-[12px] text-white/60 transition-colors hover:text-white disabled:opacity-30"
+                className="tracking-[0.06em] text-white/65 uppercase transition-colors hover:text-white disabled:opacity-30"
               >
                 ← Prev
               </button>
-              <span className="text-[11px] text-white/40">
-                {i + 1} / {pages.length}
+              <span className="tabular-nums text-white/55">
+                {i + 1}/{pages.length}
               </span>
+              {/* The one place the accent is spent in here: the forward action. */}
               <button
                 type="button"
                 onClick={() => (last ? onClose() : setI((n) => n + 1))}
-                className="flex items-center gap-1.5 rounded px-2 py-1 text-[12px] font-medium text-white/80 transition-colors hover:text-white"
+                className="flex items-center gap-1.5 tracking-[0.06em] text-[var(--ow-accent)] uppercase transition-opacity hover:opacity-80"
               >
-                {last ? "Close" : "Next"}
+                {last ? "Done" : "Next"}
                 <span className="dlg-caret" aria-hidden>
                   ▾
                 </span>
               </button>
             </>
           ) : (
-            <>
-              <span className="text-[11px] text-white/35">
-                <kbd className="font-sans">Esc</kbd> to close
-              </span>
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded px-2 py-1 text-[12px] font-medium text-white/80 transition-colors hover:text-white"
-              >
-                Close
-              </button>
-            </>
+            <span className="tracking-[0.06em] text-white/55 uppercase">
+              Esc or × to close
+            </span>
           )}
         </div>
       </div>

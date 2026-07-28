@@ -187,6 +187,30 @@ rather than rendered pixels. Measure the actual composite if you change it.
 Mounts a frame after hydration, fades in, and freezes (`speed 0`) under
 `prefers-reduced-motion`.
 
+## The overworld's type
+
+The game layer uses **Pixelify Sans** (`public/fonts/pixelify-sans-latin.woff2`,
+12KB) for its chrome — kickers, titles, labels, chips, buttons, counters, the
+banner and the hint lines. It is declared in `index.css` but **never fetched by
+the base site**: a browser only downloads a `@font-face` file when an element
+rendering it appears, and nothing outside the overworld uses it. Verified by
+watching network requests — the file arrives only when the reading panel opens.
+
+Long prose deliberately opts back out via `.ow-prose`. With smoothing off,
+Pixelify's digits are ambiguous: at 13px "~520" reads as "-820", and those
+paragraphs carry load-bearing numbers (520 tools, 131 models, 86 workers).
+Misreading them is worse than any styling gain, so the chrome carries the
+gamified feel and multi-sentence content stays legible.
+
+Two contrast traps in there, both caught by measurement rather than eye:
+
+- The panel is always dark regardless of the site's theme, so it **cannot use
+  `--color-accent`** — in light mode that token is a dark ember and lands at
+  3.3:1 on the panel. `--ow-accent` is a fixed light ember instead.
+- 10-11px chrome at `white/35`-`white/45` measured 3.3-3.9:1. The site-wide
+  contrast sweep never enters the overworld, so panel contrast needs its own
+  check. It now measures 6.22:1 at worst across 16 text nodes.
+
 ## Images
 
 There is exactly one photograph on the site, and it does three jobs. All of it

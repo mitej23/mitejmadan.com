@@ -243,11 +243,11 @@ export function Overworld() {
             tabIndex={-1}
             aria-label="Overworld mode. Arrow keys or W A S D to walk. Escape to leave."
             className={`h-full outline-none transition-[width] duration-300 ease-[var(--ease-out-quart)] motion-reduce:transition-none ${
-              pages ? "w-full sm:w-[calc(100%-24rem)]" : "w-full"
+              pages ? "w-full sm:w-[calc(100%-25rem)]" : "w-full"
             }`}
           />
           {place && (
-            <p className={`pointer-events-none absolute top-5 text-center text-[13px] font-semibold tracking-[0.06em] text-white/85 uppercase drop-shadow transition-[right] ${pages ? "left-0 right-0 sm:right-[24rem]" : "inset-x-0"}`}>
+            <p className={`ow-ui pointer-events-none absolute top-5 text-center text-[13px] tracking-[0.12em] text-white/85 uppercase drop-shadow transition-[right] ${pages ? "left-0 right-0 sm:right-[25rem]" : "inset-x-0"}`}>
               {place}
             </p>
           )}
@@ -255,19 +255,18 @@ export function Overworld() {
           {pages && <Dialogue pages={pages} onClose={() => setPages(null)} />}
 
           {near && !pages && (
-            <p className="pointer-events-none absolute inset-x-0 bottom-20 text-center text-[12.5px] font-medium text-white/80">
-              Press <kbd className="font-sans">Space</kbd> to read
+            <p className="ow-ui pointer-events-none absolute inset-x-0 bottom-24 text-center text-[12px] tracking-[0.06em] text-white/80 uppercase">
+              Press Space to read
             </p>
           )}
 
           {/* No button down here any more: it sat directly over the south gate,
               which is the way out. Walk through the gate, or use Esc / the × . */}
-          <div className={`pointer-events-none absolute bottom-3 flex flex-col items-center gap-1 transition-[right] ${pages ? "left-0 right-0 sm:right-[24rem]" : "inset-x-0"}`}>
-            <p className="text-center text-[11.5px] text-white/40">
-              Arrows / WASD to walk · <kbd className="font-sans">Space</kbd> to read ·
-              walk out the south gate to leave
+          <div className={`ow-ui pointer-events-none absolute bottom-3 flex flex-col items-center gap-1.5 transition-[right] ${pages ? "left-0 right-0 sm:right-[25rem]" : "inset-x-0"}`}>
+            <p className="text-center text-[11px] tracking-[0.05em] text-white/40 uppercase">
+              Arrows to walk · Space to read · south gate to leave
             </p>
-            <p className="text-center text-[10.5px] text-white/25">
+            <p className="text-center text-[10px] text-white/25">
               Tiles by{" "}
               <a
                 href="https://axulart.itch.io/axularts-basic-top-down-interior"
@@ -280,21 +279,22 @@ export function Overworld() {
               (CC BY 4.0) · Pocket Creature Tamer
             </p>
           </div>
-          {/* The labelled control lives at the bottom centre; this is just a
-              close affordance in the corner, so the two don't read as duplicates. */}
+          {/* Labelled, and in the opposite corner from the panel's own ×. A bare
+              × next to an open panel reads as "close the panel" — which it wasn't,
+              and that was the confusion. */}
           <button
             type="button"
             onClick={exit}
-            aria-label="Back to résumé"
-            title="Back to résumé (Esc)"
-            className={`absolute top-4 z-20 grid size-9 place-items-center rounded-full bg-white/10 text-white/70 backdrop-blur transition-[background-color,color,right] hover:bg-white/20 hover:text-white ${pages ? "right-4 sm:right-[25rem]" : "right-4"}`}
+            className="ow-ui group absolute top-4 left-4 z-20 inline-flex items-center gap-2 border border-white/25 bg-black/40 px-3 py-2 text-[11px] tracking-[0.08em] text-white/75 uppercase backdrop-blur transition-colors hover:border-white/50 hover:text-white"
           >
             <svg
               viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
-              strokeLinecap="round" strokeLinejoin="round" aria-hidden className="size-4"
+              strokeLinecap="round" strokeLinejoin="round" aria-hidden
+              className="size-3.5 transition-transform duration-200 group-hover:-translate-x-0.5"
             >
-              <path d="M18 6 6 18M6 6l12 12" />
+              <path d="M20 12H5M11 18l-6-6 6-6" />
             </svg>
+            Exit map
           </button>
         </div>
       )}
