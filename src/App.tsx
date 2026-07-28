@@ -6,13 +6,18 @@ import { Footer } from "./components/Footer";
 import { Home } from "./pages/Home";
 import { Projects } from "./pages/Projects";
 import { Experience } from "./pages/Experience";
+import { Photos } from "./pages/Photos";
 import { NotFound } from "./pages/NotFound";
 
-/** Single source of truth for routes — the prerender step reads this too. */
+/**
+ * Single source of truth for routes — the prerender step reads this too.
+ * `wide` opts a page out of the 39rem measure; only the photo grid needs it.
+ */
 export const pages = {
   "/": { el: Home, title: `${profile.name} · ${profile.role}` },
   "/projects": { el: Projects, title: `Projects · ${profile.name}` },
   "/experience": { el: Experience, title: `Experience · ${profile.name}` },
+  "/photos": { el: Photos, title: `Photos · ${profile.name}`, wide: true },
 } as const;
 
 export function App() {
@@ -34,7 +39,11 @@ export function App() {
       <main
         id="main"
         key={path}
-        className="mx-auto w-full max-w-[var(--container-col)] px-5 pt-24 pb-20 sm:px-6 sm:pt-28 sm:pb-24"
+        className={`mx-auto w-full px-5 pt-24 pb-20 sm:px-6 sm:pt-28 sm:pb-24 ${
+          match && "wide" in match && match.wide
+            ? "max-w-[54rem]"
+            : "max-w-[var(--container-col)]"
+        }`}
       >
         <Page />
         <Footer />

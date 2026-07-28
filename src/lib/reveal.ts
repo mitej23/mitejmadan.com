@@ -23,8 +23,13 @@ function get(): IntersectionObserver {
   return io;
 }
 
-/** Returns a cleanup function, so it can be used directly as a React 19 ref. */
-export function observeReveal(el: Element): () => void {
+/**
+ * Usable directly as a React 19 ref callback: accepts the null React passes on
+ * detach, and returns a cleanup React calls on unmount.
+ */
+export function observeReveal(el: Element | null): () => void {
+  if (!el) return () => {};
+
   // No observer support, or motion suppressed: show the content, full stop.
   if (
     typeof IntersectionObserver === "undefined" ||

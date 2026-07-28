@@ -7,6 +7,7 @@ const routes = [
   { href: "/", label: "Home" },
   { href: "/projects", label: "Projects" },
   { href: "/experience", label: "Experience" },
+  { href: "/photos", label: "Photos" },
 ];
 
 /** useLayoutEffect warns during the build-time prerender; useEffect never runs there. */

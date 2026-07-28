@@ -209,6 +209,91 @@ export const experience: Role[] = [
   },
 ];
 
+/* ── Photographs ────────────────────────────────────────────────────────────
+   Rendered on /photos as a two-column masonry.
+
+   Ordered, not dumped. The two Thailand sunbeam frames are near-identical in
+   tone, so they sit at positions 2 and 6 rather than side by side, and the
+   sequence alternates cool/warm so no two neighbours read the same. Opens on
+   the strongest frame and closes on the brightest.
+
+   Sources were shot on a phone; two carried EXIF orientation 6 and had the
+   rotation baked into the pixels during export, because `cwebp` doesn't read
+   EXIF and would otherwise have published them on their side.
+
+   `alt` describes what is in the frame. Captions are intentionally absent —
+   see TODO below if you want them.
+   ────────────────────────────────────────────────────────────────────────── */
+
+export type Photo = {
+  slug: string;
+  /** Intrinsic size of the exported asset — reserves the box, prevents reflow. */
+  w: number;
+  h: number;
+  alt: string;
+  lqip: string;
+  /**
+   * Which desktop column this frame sits in. Explicit rather than left to CSS
+   * `columns`, which fills top-to-bottom per column and put the two
+   * near-identical sunbeam frames side by side. Array order is the mobile
+   * (single-column) reading order; `col` is the desktop arrangement.
+   */
+  col: 0 | 1;
+};
+
+// TODO(mitej): no captions and no locations. I'm not guessing where these were
+// shot. If you want them, add a `caption` field here and render it in PhotoGrid.
+export const photos: Photo[] = [
+  {
+    slug: "fog-trees",
+    col: 0,
+    w: 1125,
+    h: 1500,
+    alt: "Two bare trees on a hillside in heavy fog, their branches meeting against a flat grey sky.",
+    lqip: "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAABwBACdASoUABsAPtlWpUyoJKOiN/VYAQAbCWcAygBFX7f3wShdfnmfutAUAAD+5yZzC6/maFP7AjbFU3v2qQy4Od6sOJfsxqCIFHjkS9tzpd1cNXEvUAAA",
+  },
+  {
+    slug: "stage-blue",
+    col: 1,
+    w: 1125,
+    h: 1500,
+    alt: "A performer alone behind a booth on a vast blue-lit stage, seen over a crowd of raised phones.",
+    lqip: "data:image/webp;base64,UklGRooAAABXRUJQVlA4IH4AAADwBACdASoUABsAPtVYpEyoJSOiMAwBABqJagCdL3WB0xZS8EkL3NTsKOzhJDCzk8AA/vVvsFoGHajN9YvRCtmXIEVdgwyhn8+2wxNKOe63OLkymLSV8vV0PPwK16fdds4bp9o9TrKfFcARJ1JcIbrLRxJBeVjpMk/AaThAAAA=",
+  },
+  {
+    slug: "longtail-sunbeams",
+    col: 0,
+    w: 1500,
+    h: 1500,
+    alt: "A longtail boat in silhouette at dusk as sunbeams break through a heavy cloud bank over the sea.",
+    lqip: "data:image/webp;base64,UklGRowAAABXRUJQVlA4IIAAAACwBACdASoUABQAPt1cqE0opSQiKA1REBuJZwDKABIlzUdKLf0Y0h4eiQ7vAsgAAP3v2maz3TP30FP2+6kcfYzJD5K267Pk80hySqfrjcIHs0hJ8GlKKfX54zWNk/ZhqnYaDf+TTtBkCBwF1sPzMZLBPOqWIedptIeELCjprOAAAA==",
+  },
+  {
+    slug: "fort-lake",
+    col: 1,
+    w: 1125,
+    h: 1500,
+    alt: "A hilltop fort wall dropping away to a hazy lake far below, with visitors climbing the mossy steps.",
+    lqip: "data:image/webp;base64,UklGRpoAAABXRUJQVlA4II4AAADwBACdASoUABsAPt1mrFCopSQiqAgBEBuJZQAA7OVa4OaLdgyfZpmIvqDYCD3ZfoAA/u07T4RpcF4TzvjLZLN7ibnprhcgtwt4HIiLTJ3dFA7xoqduHGRjEyq7RtBPat6RvyHuEAba199qfiRUXmOxUgokYDS7bgrPV1iVfjkxQN2GvvHZa6IRKzVcIAAA",
+  },
+  {
+    slug: "valley-tree",
+    col: 0,
+    w: 1125,
+    h: 1500,
+    alt: "Two monkeys running along a branch of a broad tree that frames a green valley and distant fields.",
+    lqip: "data:image/webp;base64,UklGRgABAABXRUJQVlA4IPQAAAAwBgCdASoUABsAPt1aqU6opKOiMBgIARAbiWcABmgaQJmkJ/OP9ke+gr086v29xeUnHWuX9bgggLkAAP7TvHZzVlPWmEdF5rFR1E8kHhAmH1pB5vYrwKw9EIQh4hh4W4R+OxS2SmtbP5sZxRvok+VeFfP9Y4Ce0tDZfSVjKgD1c3ZAPghGODqn1pT4t245MuuA62301d5JoN0WcoI3rEJsTsAQ0ndW/kCIsNEXt/oe0W3nU3tWUXLjeJH9W6JeUgB4yZ89r9vOtHBsArMI5TXvo3k8VGBMf99GZ5RSrmcFFgsYZ9XuqBpwD8Ul9pZwX3xne8AA",
+  },
+  {
+    slug: "fisherman-dusk",
+    col: 1,
+    w: 1500,
+    h: 828,
+    alt: "A lone figure casting a fishing line from black rocks at dusk, with moored sailboats scattered across the bay.",
+    lqip: "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAAAQBACdASoUAAwAPt1cpkyopSOiMAgBEBuJZwDDNCKjyzRri+mpZoXQAAD+sGblIm4gzo0CK4Eds1M5uDeFUfIN3O9hTjVx/FV7NI629kWKUgJz4sOkAAAA",
+  },
+];
+
 /* ── Systems ────────────────────────────────────────────────────────────────
    Work built at TheAgentic, rendered under the role on /experience.
 

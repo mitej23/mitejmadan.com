@@ -2,6 +2,7 @@ import { capabilities, offClock, profile, projects, stack } from "../content";
 import { Avatar } from "../components/Avatar";
 import { LocalTime } from "../components/LocalTime";
 import { Photo } from "../components/Photo";
+import { PhotoStrip } from "../components/PhotoStrip";
 import { ProjectRow } from "../components/ProjectRow";
 import { Reveal } from "../components/Reveal";
 import { Section } from "../components/Section";
@@ -135,6 +136,17 @@ export function Home() {
             <p className="text-[14.5px] leading-[1.68] text-ink-2">{offClock}</p>
           </Reveal>
         </div>
+      </Section>
+
+      {/* ── Photography ── */}
+      <Section label="Photographs">
+        <Reveal>
+          <p className="mb-5 text-[14px] leading-[1.65] text-ink-2">
+            Recently started carrying a camera. Mostly water, weather, and whatever the
+            light happened to be doing.
+          </p>
+          <PhotoStrip />
+        </Reveal>
       </Section>
 
       {/* ── Contact ── */}

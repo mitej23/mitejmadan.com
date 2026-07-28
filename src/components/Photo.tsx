@@ -1,20 +1,19 @@
-import { useState } from "react";
 import { photo } from "../content";
+import { useImageLoaded } from "../lib/useImageLoaded";
 
 /**
  * The single photograph on the site.
  *
  * The LQIP sits behind the real image as a scaled-up background, so the frame is
  * filled with the right colours from the first paint — including before any JS
- * runs, since the data URI is in the prerendered HTML. The real file fades over
- * it on decode; `onLoad` also fires for images already in the browser cache, so
- * a repeat visit doesn't sit at the placeholder.
+ * runs, since the data URI is in the prerendered HTML. The real file then fades
+ * over it. See useImageLoaded for why the fade can't rely on `onLoad` alone.
  *
  * `width`/`height` are set on the element to reserve the aspect ratio and keep
  * the layout from shifting when it lands.
  */
 export function Photo({ className = "" }: { className?: string }) {
-  const [loaded, setLoaded] = useState(false);
+  const { loaded, ref, onLoad } = useImageLoaded();
 
   return (
     <figure className={className}>
@@ -31,7 +30,8 @@ export function Photo({ className = "" }: { className?: string }) {
           alt={photo.alt}
           loading="lazy"
           decoding="async"
-          onLoad={() => setLoaded(true)}
+          ref={ref}
+          onLoad={onLoad}
           className="size-full object-cover transition-opacity duration-500 ease-[var(--ease-out-quart)] motion-reduce:transition-none"
           style={{ opacity: loaded ? 1 : 0 }}
         />
