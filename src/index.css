@@ -293,6 +293,38 @@
     }
   }
 
+  /* Progressive disclosure on the dense half of each system. Native <details>,
+     so it opens with zero JS and carries its own semantics. */
+  .disc > summary {
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .disc > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .disc > summary svg {
+    transition: transform 260ms var(--ease-out-quart);
+  }
+
+  .disc[open] > summary svg {
+    transform: rotate(90deg);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .disc[open] > .disc-body {
+      animation: disc-open 320ms var(--ease-out-quart);
+    }
+  }
+
+  @keyframes disc-open {
+    from {
+      opacity: 0;
+      transform: translate3d(0, -4px, 0);
+    }
+  }
+
   /* Link underline that grows from the left on hover — cheap, transform-only,
      and it reads as a deliberate affordance rather than a default underline. */
   .link {

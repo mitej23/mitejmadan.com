@@ -3,13 +3,16 @@ import { Reveal } from "./Reveal";
 import { Rich } from "./Rich";
 
 /**
- * One anonymised system. Deliberately roomier than a résumé bullet: the domain
- * sits above the title as a quiet kicker, then what it is, then the part worth
- * reading — and a scope line whenever the work was one piece of a larger effort.
+ * One anonymised system.
+ *
+ * Eight of these stacked was a wall of prose, so the dense half — what made it
+ * hard, and whose work it was — sits behind a disclosure. Collapsed, a reader
+ * gets domain, title, one paragraph and the stack; expanded, they get the
+ * engineering. Native <details>, so it works with JS off.
  */
 export function SystemRow({ system, i }: { system: System; i: number }) {
   return (
-    <Reveal as="li" i={i} className="border-t border-rule py-6 first:border-t-0 first:pt-1">
+    <Reveal as="li" i={i} className="border-t border-rule py-7 first:border-t-0 first:pt-1">
       <p className="mb-1.5 text-[11px] leading-none font-semibold tracking-[0.07em] text-ink-3 uppercase">
         {system.domain}
       </p>
@@ -18,24 +21,42 @@ export function SystemRow({ system, i }: { system: System; i: number }) {
         {system.title}
       </h3>
 
-      <p className="mt-2 text-[14px] leading-[1.65] text-ink-2">
+      <p className="mt-2.5 text-[14px] leading-[1.65] text-ink-2">
         <Rich text={system.body} />
       </p>
 
-      {/* Neutral rule, not ember — this paragraph appears seven times on the page,
-          and a coloured bar repeated that often stops being emphasis. */}
-      <p className="mt-3 border-l border-rule-strong pl-3.5 text-[13.5px] leading-[1.65] text-ink-2">
-        <Rich text={system.hard} />
-      </p>
+      <details className="disc group mt-3.5">
+        <summary className="inline-flex items-center gap-1.5 rounded text-[12.5px] font-medium text-ink-3 transition-colors duration-200 ease-[var(--ease-out-quart)] hover:text-accent">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+            className="size-3"
+          >
+            <path d="M9 6l6 6-6 6" />
+          </svg>
+          What made it hard
+        </summary>
 
-      {system.role && (
-        <p className="mt-3 text-[12.5px] leading-[1.6] text-ink-3">
-          <span className="font-medium text-ink-2">Scope — </span>
-          {system.role}
-        </p>
-      )}
+        <div className="disc-body mt-3">
+          <p className="border-l border-rule-strong pl-3.5 text-[13.5px] leading-[1.65] text-ink-2">
+            <Rich text={system.hard} />
+          </p>
 
-      <ul className="mt-3.5 flex flex-wrap gap-x-1.5 gap-y-1">
+          {system.role && (
+            <p className="mt-3 text-[12.5px] leading-[1.6] text-ink-3">
+              <span className="font-medium text-ink-2">Scope — </span>
+              {system.role}
+            </p>
+          )}
+        </div>
+      </details>
+
+      <ul className="mt-4 flex flex-wrap gap-x-1.5 gap-y-1">
         {system.stack.map((s) => (
           <li
             key={s}

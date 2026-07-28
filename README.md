@@ -46,8 +46,10 @@ Then update the domain: `SITE` in `scripts/prerender.mjs`, and the `canonical` /
 
 ## The anonymised systems
 
-`systems` in `src/content.ts` describes seven systems built at TheAgentic and
-renders them on `/experience`. **No product, company, or client name appears in
+`systems` in `src/content.ts` describes eight systems built at TheAgentic and
+renders them on `/experience`. The dense half of each — what made it hard, and
+whose work it was — sits behind a native `<details>`, so eight of them stacked
+reads as a list rather than a wall. It opens with JS off. **No product, company, or client name appears in
 any of them**, and nothing identifies a specific customer. What's kept is the
 sector, the architecture, and the engineering — standard practice for work under
 NDA, and the part a reader is actually evaluating.
