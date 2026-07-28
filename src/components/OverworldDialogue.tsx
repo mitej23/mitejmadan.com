@@ -156,11 +156,11 @@ export function Dialogue({ pages, onClose }: { pages: Page[]; onClose: () => voi
         <div className="flex shrink-0 items-start gap-3 border-b border-white/10 px-5 py-4">
           <div className="min-w-0 flex-1">
             {page.kicker && (
-              <p className="mb-1.5 text-[10px] leading-none tracking-[0.14em] text-white/60 uppercase">
+              <p className="mb-1.5 text-[11px] leading-none tracking-[0.14em] text-white/60 uppercase">
                 {page.kicker}
               </p>
             )}
-            <h2 className="text-[17px] leading-[1.35] text-white">{page.title}</h2>
+            <h2 className="text-[18px] leading-[1.4] text-white">{page.title}</h2>
           </div>
           <button
             type="button"
@@ -179,7 +179,7 @@ export function Dialogue({ pages, onClose }: { pages: Page[]; onClose: () => voi
 
         <div ref={scroller} className="flex-1 overflow-y-auto px-5 py-5">
           {page.body && (
-            <p className="ow-prose text-[13.5px] whitespace-pre-line text-white/80">{page.body}</p>
+            <p className="ow-prose whitespace-pre-line text-white/85">{page.body}</p>
           )}
 
           {page.items && (
@@ -187,7 +187,7 @@ export function Dialogue({ pages, onClose }: { pages: Page[]; onClose: () => voi
               {page.items.map((it) => (
                 <li
                   key={it}
-                  className="ow-prose relative pl-4 text-[13px] text-white/75 before:absolute before:top-[0.62em] before:left-0 before:size-[3px] before:bg-white/30"
+                  className="ow-prose relative pl-4 text-white/80 before:absolute before:top-[0.75em] before:left-0 before:size-[3px] before:bg-white/35"
                 >
                   {it}
                 </li>
@@ -198,17 +198,17 @@ export function Dialogue({ pages, onClose }: { pages: Page[]; onClose: () => voi
           {/* Hairlines divide; nothing is boxed. */}
           {page.aside?.map((a) => (
             <div key={a.label} className="mt-5 border-l border-white/15 pl-4">
-              <p className="mb-1.5 text-[10px] leading-none tracking-[0.14em] text-white/60 uppercase">
+              <p className="mb-1.5 text-[11px] leading-none tracking-[0.14em] text-white/60 uppercase">
                 {a.label}
               </p>
-              <p className="ow-prose text-[13px] whitespace-pre-line text-white/70">{a.text}</p>
+              <p className="ow-prose whitespace-pre-line text-white/75">{a.text}</p>
             </div>
           ))}
 
           {page.tags && (
             <ul className="mt-5 flex flex-wrap gap-1.5">
               {page.tags.map((t) => (
-                <li key={t} className="bg-white/10 px-1.5 py-0.5 text-[11px] text-white/70">
+                <li key={t} className="bg-white/10 px-2 py-0.5 text-[12px] text-white/75">
                   {t}
                 </li>
               ))}
@@ -216,36 +216,37 @@ export function Dialogue({ pages, onClose }: { pages: Page[]; onClose: () => voi
           )}
         </div>
 
-        <div className="flex shrink-0 items-center justify-between border-t border-white/10 px-5 py-3.5 text-[11px]">
+        {/* Paging is the main control now that entries are long, so it gets real
+            buttons and a visible count rather than small text links. */}
+        <div className="shrink-0 border-t border-white/10 px-4 py-3">
           {many ? (
-            <>
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setI((n) => Math.max(0, n - 1))}
                 disabled={i === 0}
-                className="tracking-[0.06em] text-white/65 uppercase transition-colors hover:text-white disabled:opacity-30"
+                aria-label="Previous entry"
+                className="flex size-9 items-center justify-center border border-white/20 text-[15px] text-white/75 transition-colors hover:border-white/45 hover:text-white disabled:opacity-25 disabled:hover:border-white/20"
               >
-                ← Prev
+                ←
               </button>
-              <span className="tabular-nums text-white/55">
-                {i + 1}/{pages.length}
+              <span className="flex-1 text-center text-[12px] tracking-[0.08em] text-white/55 tabular-nums">
+                {i + 1} / {pages.length}
               </span>
-              {/* The one place the accent is spent in here: the forward action. */}
               <button
                 type="button"
                 onClick={() => (last ? onClose() : setI((n) => n + 1))}
-                className="flex items-center gap-1.5 tracking-[0.06em] text-[var(--ow-accent)] uppercase transition-opacity hover:opacity-80"
+                aria-label={last ? "Close panel" : "Next entry"}
+                className="flex h-9 items-center gap-2 border border-[var(--ow-accent)]/50 px-3 text-[12px] tracking-[0.08em] text-[var(--ow-accent)] uppercase transition-colors hover:border-[var(--ow-accent)] hover:bg-[var(--ow-accent)]/10"
               >
                 {last ? "Done" : "Next"}
-                <span className="dlg-caret" aria-hidden>
-                  ▾
-                </span>
+                <span aria-hidden>→</span>
               </button>
-            </>
+            </div>
           ) : (
-            <span className="tracking-[0.06em] text-white/55 uppercase">
+            <p className="py-1 text-center text-[12px] tracking-[0.08em] text-white/50 uppercase">
               Esc or × to close
-            </span>
+            </p>
           )}
         </div>
       </div>

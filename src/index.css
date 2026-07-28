@@ -28,7 +28,24 @@
 }
 
 /**
- * Pixelify Sans — the overworld's typeface. Declared here but never fetched by
+ * VT323 — the overworld's prose face. Chosen over Pixelify Sans because
+ * Pixelify's 5 reads as an 8 or an S with smoothing off, at any size I tried, and
+ * these paragraphs carry load-bearing numbers (520 tools, 131 models). A terminal
+ * face has unambiguous digits by design.
+ */
+@font-face {
+  font-family: "VT323";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/vt323-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/**
+ * Pixelify Sans — the overworld's display face, for headings and chrome. Declared here but never fetched by
  * the base site: a browser only downloads a @font-face file when an element
  * actually rendering it appears, and nothing outside the overworld uses it.
  */
@@ -408,20 +425,17 @@
   }
 
   /**
-   * Long prose opts back out of the pixel face.
-   *
-   * Pixelify's digits are ambiguous with smoothing off — at 13px "~520" reads as
-   * "-820", and these paragraphs carry load-bearing numbers (520 tools, 131
-   * models, 86 workers). Misreading them is worse than any styling gain. So the
-   * chrome — kickers, titles, labels, chips, buttons, counters — stays pixel and
-   * carries the gamified feel, while multi-sentence content stays legible.
+   * Panel prose. Everything in the overworld is pixel-set, so legibility is
+   * bought with size rather than by swapping face: at 13px Pixelify's digits are
+   * ambiguous ("~520" reads as "-820") and these paragraphs carry load-bearing
+   * numbers. At 15px with this leading they resolve, so the whole panel can stay
+   * in the game's own type.
    */
   .ow-prose {
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    font-smooth: auto;
-    letter-spacing: normal;
-    line-height: 1.65;
+    font-family: "VT323", ui-monospace, monospace;
+    font-size: 17px;
+    line-height: 1.55;
+    letter-spacing: 0.02em;
   }
 
   /* Link underline that grows from the left on hover — cheap, transform-only,

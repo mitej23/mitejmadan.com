@@ -515,6 +515,34 @@ export async function mountGame(
     for (const d of layer) d.paint();
 
     ctx.restore();
+
+    /**
+     * Building name plates, drawn in screen space after the world transform so
+     * the text stays a readable size instead of scaling with the tiles.
+     *
+     * These exist because nothing outside the buildings said which was which, so
+     * it was easy to walk into one thinking it was another and conclude the wrong
+     * content was showing.
+     */
+    if (!inside) {
+      const size = Math.max(9, Math.round(3.6 * scale));
+      ctx.font = `${size}px "Pixelify Sans", ui-monospace, monospace`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "alphabetic";
+      for (const b of BUILDINGS) {
+        const label = ROOMS[b.id].name.toUpperCase();
+        const wx = (b.tx + b.tw / 2) * TILE;
+        const wy = b.ty * TILE - 3;
+        const sx2 = (wx - camX) * scale;
+        const sy2 = (wy - camY) * scale;
+        if (sy2 < size || sy2 > canvas.clientHeight) continue;
+        ctx.lineWidth = Math.max(2, scale);
+        ctx.strokeStyle = "rgba(12,14,10,0.85)";
+        ctx.strokeText(label, sx2, sy2);
+        ctx.fillStyle = "rgba(255,255,255,0.92)";
+        ctx.fillText(label, sx2, sy2);
+      }
+    }
   }
 
   // Fixed-step logic, decoupled from render, so movement speed does not depend

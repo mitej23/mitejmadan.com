@@ -189,27 +189,37 @@ Mounts a frame after hydration, fades in, and freezes (`speed 0`) under
 
 ## The overworld's type
 
-The game layer uses **Pixelify Sans** (`public/fonts/pixelify-sans-latin.woff2`,
-12KB) for its chrome — kickers, titles, labels, chips, buttons, counters, the
-banner and the hint lines. It is declared in `index.css` but **never fetched by
-the base site**: a browser only downloads a `@font-face` file when an element
-rendering it appears, and nothing outside the overworld uses it. Verified by
-watching network requests — the file arrives only when the reading panel opens.
+Two pixel faces, both lazily fetched — declared in `index.css` but never
+downloaded by the base site, because a browser only fetches a `@font-face` file
+when an element rendering it appears and nothing outside the overworld uses them.
+Verified by watching requests: they arrive when the reading panel opens, not on
+page load.
 
-Long prose deliberately opts back out via `.ow-prose`. With smoothing off,
-Pixelify's digits are ambiguous: at 13px "~520" reads as "-820", and those
-paragraphs carry load-bearing numbers (520 tools, 131 models, 86 workers).
-Misreading them is worse than any styling gain, so the chrome carries the
-gamified feel and multi-sentence content stays legible.
+| Face | Size | Used for |
+|---|---|---|
+| **Pixelify Sans** | 12KB | Display — kickers, titles, buttons, chips, banner, hints, building name plates |
+| **VT323** | 7KB | Prose — paragraphs, bullets, asides |
 
-Two contrast traps in there, both caught by measurement rather than eye:
+The split is not stylistic, it's about digits. **Pixelify's 5 reads as an 8 or an
+S with smoothing off, at every size tried (13px and 15px both fail)**, and these
+paragraphs carry load-bearing numbers — 520 tools, 131 models, 86 workers. A
+reader misreading those is worse than any styling gain. VT323 is a terminal face,
+so its digits are unambiguous by design, and it's still unmistakably pixel. Both
+were checked by cropping rendered text at true size rather than by eye.
+
+Antialiasing is switched off (`-webkit-font-smoothing: none`) because a pixel face
+is only crisp unsmoothed, and the site body turns smoothing on. Hierarchy comes
+from scale, case and space rather than weight, since neither face has a usable
+weight range.
+
+Two contrast traps in there, both caught by measurement:
 
 - The panel is always dark regardless of the site's theme, so it **cannot use
-  `--color-accent`** — in light mode that token is a dark ember and lands at
+  `--color-accent`** — in light mode that token is a dark ember and landed at
   3.3:1 on the panel. `--ow-accent` is a fixed light ember instead.
-- 10-11px chrome at `white/35`-`white/45` measured 3.3-3.9:1. The site-wide
-  contrast sweep never enters the overworld, so panel contrast needs its own
-  check. It now measures 6.22:1 at worst across 16 text nodes.
+- 10-11px chrome at `white/35`-`white/45` measured 3.3-3.9:1. **The site-wide
+  contrast sweep never enters the overworld**, so the panel needs its own check.
+  It now measures 6.22:1 at worst across 15 text nodes.
 
 ## Images
 
