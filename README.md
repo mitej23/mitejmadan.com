@@ -67,14 +67,17 @@ Terminology follows what frontier-lab engineering writing actually uses:
 *human-in-the-loop*. Notably **not** "supervisor agent", which reads as standard
 but appears in none of the current primary sources.
 
-There's a leak check worth re-running after any edit to that section:
+Re-run a leak check after any edit to that section. The pattern itself is
+deliberately **not** committed — writing the client list into this file to guard
+against publishing the client list rather defeats the point. Keep it in an
+untracked `.leakcheck` (already gitignored):
 
 ```bash
 grep -rEioh -f .leakcheck dist/ src/
 ```
 
-It should return nothing. (`src/lib/reveal.ts` matches "nishe" inside the word
-"finishes" — that's the one known false positive.)
+One line per identifier, and it should return nothing. Watch for substring false
+positives — a short product name can hide inside an ordinary English word.
 
 ## How it's built
 

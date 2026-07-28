@@ -17,3 +17,6 @@ pnpm-debug.log*
 # Build caches
 .vite/
 *.tsbuildinfo
+
+# Local-only anonymisation check — must never be committed
+.leakcheck
