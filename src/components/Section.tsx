@@ -2,9 +2,13 @@ import type { ReactNode } from "react";
 import { Reveal } from "./Reveal";
 
 /**
- * Every section is labelled the same way: a small quiet kicker preceded by a
- * single ember dot. The dot is one of the few places the accent gets spent, so
- * it does the work of marking structure without a heavy heading.
+ * Every section is labelled the same way: a small quiet kicker with a hairline
+ * running out to the edge of the measure.
+ *
+ * This replaced an ember dot. A coloured dot in front of a label is decoration —
+ * it draws the eye without telling it anything. The rule does the same job
+ * structurally, reads as a divider rather than an ornament, and keeps the accent
+ * reserved for things that are actually interactive.
  */
 export function Section({
   label,
@@ -26,12 +30,11 @@ export function Section({
 }) {
   return (
     <section id={id} className={`${gap} ${className}`}>
-      <Reveal
-        as="h2"
-        className="mb-6 flex items-center gap-2 text-[11px] leading-none font-semibold tracking-[0.09em] text-ink-3 uppercase"
-      >
-        <span aria-hidden className="size-[3px] rounded-full bg-accent" />
-        {label}
+      <Reveal as="h2" className="mb-6 flex items-center gap-3.5">
+        <span className="shrink-0 text-[11px] leading-none font-semibold tracking-[0.09em] text-ink-3 uppercase">
+          {label}
+        </span>
+        <span aria-hidden className="h-px flex-1 bg-rule" />
       </Reveal>
       {children}
     </section>

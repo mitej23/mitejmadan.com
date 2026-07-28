@@ -22,7 +22,9 @@ export function SystemRow({ system, i }: { system: System; i: number }) {
         <Rich text={system.body} />
       </p>
 
-      <p className="mt-3 border-l border-accent/35 pl-3.5 text-[13.5px] leading-[1.65] text-ink-2">
+      {/* Neutral rule, not ember — this paragraph appears seven times on the page,
+          and a coloured bar repeated that often stops being emphasis. */}
+      <p className="mt-3 border-l border-rule-strong pl-3.5 text-[13.5px] leading-[1.65] text-ink-2">
         <Rich text={system.hard} />
       </p>
 
